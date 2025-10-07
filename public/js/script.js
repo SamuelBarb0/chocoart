@@ -208,56 +208,173 @@ productCards.forEach(card => {
 });
 
 // =============================================
-// GALLERY LIGHTBOX EFFECT (Simple Version)
+// GALLERY LIGHTBOX EFFECT
 // =============================================
 const galleryItems = document.querySelectorAll('.gallery-item');
 
 galleryItems.forEach(item => {
     item.addEventListener('click', () => {
-        const title = item.querySelector('h4').textContent;
+        const title = item.querySelector('h4') ? item.querySelector('h4').textContent : 'Galería';
+        const placeholder = item.querySelector('.gallery-placeholder, > div:first-child');
 
-        // Create lightbox
+        // Get background gradient from the clicked item
+        let backgroundGradient = 'linear-gradient(135deg, #e28dc4, #81cacf)';
+        if (placeholder) {
+            const computedStyle = window.getComputedStyle(placeholder);
+            backgroundGradient = computedStyle.backgroundImage || computedStyle.background;
+        }
+
+        // Create lightbox overlay
         const lightbox = document.createElement('div');
+        lightbox.className = 'gallery-lightbox';
         lightbox.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10000;
-            cursor: pointer;
             animation: fadeIn 0.3s ease;
+            padding: 2rem;
         `;
 
-        const content = document.createElement('div');
-        content.style.cssText = `
-            text-align: center;
-            color: white;
+        // Create close button
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = `
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        `;
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10001;
+        `;
+        closeBtn.addEventListener('mouseenter', () => {
+            closeBtn.style.background = '#e28dc4';
+            closeBtn.style.transform = 'rotate(90deg) scale(1.1)';
+        });
+        closeBtn.addEventListener('mouseleave', () => {
+            closeBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+            closeBtn.style.transform = 'rotate(0deg) scale(1)';
+        });
+
+        // Create image container
+        const imageContainer = document.createElement('div');
+        imageContainer.style.cssText = `
             max-width: 90%;
-        `;
-        content.innerHTML = `
-            <h2 style="font-size: 2rem; margin-bottom: 1rem; font-family: 'Poppins', sans-serif;">${title}</h2>
-            <p style="font-family: 'Dancing Script', cursive; font-size: 1.5rem; opacity: 0.8;">Haz clic en cualquier lugar para cerrar</p>
+            max-height: 80vh;
+            width: 600px;
+            height: 600px;
+            border-radius: 20px;
+            background: ${backgroundGradient};
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+            animation: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         `;
 
-        lightbox.appendChild(content);
+        // Add shimmer effect
+        const shimmer = document.createElement('div');
+        shimmer.style.cssText = `
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        `;
+        imageContainer.appendChild(shimmer);
+
+        // Create title overlay
+        const titleOverlay = document.createElement('div');
+        titleOverlay.style.cssText = `
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        `;
+        titleOverlay.innerHTML = `
+            <h2 style="font-size: 2rem; margin-bottom: 0.5rem; font-family: 'Poppins', sans-serif; font-weight: 600;">${title}</h2>
+            <p style="font-family: 'Dancing Script', cursive; font-size: 1.2rem; opacity: 0.9;">Creación artesanal de Chocoart</p>
+        `;
+        imageContainer.appendChild(titleOverlay);
+
+        // Create instruction text
+        const instruction = document.createElement('p');
+        instruction.style.cssText = `
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        `;
+        instruction.textContent = 'Haz clic en cualquier lugar para cerrar';
+
+        // Append elements
+        lightbox.appendChild(closeBtn);
+        lightbox.appendChild(imageContainer);
+        lightbox.appendChild(instruction);
         document.body.appendChild(lightbox);
 
-        // Close on click
-        lightbox.addEventListener('click', () => {
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+
+        // Close functions
+        const closeLightbox = () => {
             lightbox.style.animation = 'fadeOut 0.3s ease';
+            imageContainer.style.animation = 'zoomOut 0.3s ease';
             setTimeout(() => {
                 lightbox.remove();
+                document.body.style.overflow = '';
             }, 300);
+        };
+
+        // Close on background click
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
         });
+
+        // Close on button click
+        closeBtn.addEventListener('click', closeLightbox);
+
+        // Close on ESC key
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeLightbox();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
     });
 });
 
-// Add fade animations
+// Add lightbox animations
 const fadeStyle = document.createElement('style');
 fadeStyle.textContent = `
     @keyframes fadeIn {
@@ -268,6 +385,47 @@ fadeStyle.textContent = `
     @keyframes fadeOut {
         from { opacity: 1; }
         to { opacity: 0; }
+    }
+
+    @keyframes zoomIn {
+        from {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes zoomOut {
+        from {
+            opacity: 1;
+            transform: scale(1);
+        }
+        to {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+    }
+
+    @keyframes shimmer {
+        0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        25% {
+            transform: translate(10%, -10%) rotate(5deg);
+        }
+        50% {
+            transform: translate(-5%, 10%) rotate(-5deg);
+        }
+        75% {
+            transform: translate(-10%, -5%) rotate(3deg);
+        }
+    }
+
+    .gallery-lightbox * {
+        box-sizing: border-box;
     }
 `;
 document.head.appendChild(fadeStyle);
@@ -374,4 +532,134 @@ if (window.innerWidth > 1024) {
             }
         });
     });
+}
+
+// =============================================
+// HERO CAROUSEL
+// =============================================
+const initCarousel = () => {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const indicators = document.querySelectorAll('.carousel-indicators .indicator');
+    const prevBtn = document.querySelector('.carousel-control.prev');
+    const nextBtn = document.querySelector('.carousel-control.next');
+
+    if (!slides.length) return;
+
+    let currentSlide = 0;
+    let isTransitioning = false;
+    let autoplayInterval;
+
+    const showSlide = (index) => {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        // Remove active class from all
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+
+        // Add active to current
+        slides[index].classList.add('active');
+        indicators[index].classList.add('active');
+
+        currentSlide = index;
+
+        setTimeout(() => {
+            isTransitioning = false;
+        }, 600);
+    };
+
+    const nextSlide = () => {
+        const next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    };
+
+    const prevSlide = () => {
+        const prev = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(prev);
+    };
+
+    // Event listeners
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            resetAutoplay();
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            resetAutoplay();
+        });
+    }
+
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            showSlide(index);
+            resetAutoplay();
+        });
+    });
+
+    // Autoplay
+    const startAutoplay = () => {
+        autoplayInterval = setInterval(nextSlide, 5000);
+    };
+
+    const stopAutoplay = () => {
+        if (autoplayInterval) {
+            clearInterval(autoplayInterval);
+        }
+    };
+
+    const resetAutoplay = () => {
+        stopAutoplay();
+        startAutoplay();
+    };
+
+    // Touch/Swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    const carouselContainer = document.querySelector('.carousel-container');
+
+    if (carouselContainer) {
+        carouselContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        carouselContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        const handleSwipe = () => {
+            if (touchEndX < touchStartX - 50) {
+                // Swipe left
+                nextSlide();
+                resetAutoplay();
+            }
+            if (touchEndX > touchStartX + 50) {
+                // Swipe right
+                prevSlide();
+                resetAutoplay();
+            }
+        };
+    }
+
+    // Pause autoplay on hover
+    const carouselSlides = document.querySelector('.carousel-slides');
+    if (carouselSlides) {
+        carouselSlides.addEventListener('mouseenter', stopAutoplay);
+        carouselSlides.addEventListener('mouseleave', startAutoplay);
+    }
+
+    // Start autoplay
+    startAutoplay();
+};
+
+// Initialize carousel when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCarousel);
+} else {
+    initCarousel();
 }

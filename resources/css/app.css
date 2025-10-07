@@ -7,6 +7,71 @@
 @source "../**/*.vue";
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Brand Colors */
+    --color-pink: #e28dc4;
+    --color-aqua: #81cacf;
+    --color-lime: #c6d379;
+    --color-chocolate: #5f3917;
+    --color-pink-light: #fce4ec;
+    --color-aqua-light: #e1f5fe;
+    --color-cream: #fff3e0;
+}
+
+@layer components {
+  .container-choco { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+}
+
+@layer utilities {
+  /* Keyframes */
+  @keyframes fade-in   { from{opacity:0} to{opacity:1} }
+  @keyframes fade-up   { from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:translateY(0)} }
+  @keyframes fade-down { from{opacity:0; transform:translateY(-12px)} to{opacity:1; transform:translateY(0)} }
+  @keyframes slide-left  { from{opacity:0; transform:translateX(18px)} to{opacity:1; transform:translateX(0)} }
+  @keyframes slide-right { from{opacity:0; transform:translateX(-18px)} to{opacity:1; transform:translateX(0)} }
+  @keyframes pop { 0%{transform:scale(.96); opacity:.5} 100%{transform:scale(1); opacity:1} }
+  @keyframes float { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-6px) } }
+  @keyframes blob {
+    0%,100%{ transform: translate(0,0) scale(1) }
+    33%{ transform: translate(6px,-8px) scale(1.02) }
+    66%{ transform: translate(-8px,6px) scale(.98) }
+  }
+  @keyframes shimmer {
+    0%{ background-position:-200% 0 }
+    100%{ background-position:200% 0 }
+  }
+
+  /* Clases de animación */
+  .animate-fade-in   { animation: fade-in .6s var(--eas, cubic-bezier(.22,.8,.26,.99)) both; }
+  .animate-fade-up   { animation: fade-up .65s var(--eas, cubic-bezier(.22,.8,.26,.99)) both; }
+  .animate-fade-down { animation: fade-down .65s var(--eas, cubic-bezier(.22,.8,.26,.99)) both; }
+  .animate-slide-left  { animation: slide-left .65s var(--eas, cubic-bezier(.22,.8,.26,.99)) both; }
+  .animate-slide-right { animation: slide-right .65s var(--eas, cubic-bezier(.22,.8,.26,.99)) both; }
+  .animate-pop { animation: pop .45s var(--eas, cubic-bezier(.22,.8,.26,.99)) both; }
+  .animate-float { animation: float 4s ease-in-out infinite; }
+  .animate-blob { animation: blob 9s ease-in-out infinite; filter: blur(24px); opacity:.6 }
+  .animate-shimmer { background-size: 200% 100%; animation: shimmer 2s linear infinite; }
+
+  /* Helpers de delay (puedes usar más con arbitrary: [animation-delay:XXXms]) */
+  .anim-delay-100 { animation-delay: .1s; }
+  .anim-delay-200 { animation-delay: .2s; }
+  .anim-delay-300 { animation-delay: .3s; }
+  .anim-delay-400 { animation-delay: .4s; }
+}
+
+/* Carousel Custom Styles */
+.carousel-slide.active {
+  opacity: 1 !important;
+  pointer-events: all;
+}
+
+.carousel-slide {
+  pointer-events: none;
+}
+
+.indicator[data-active="true"] {
+  width: 2rem !important;
+  background-color: #e28dc4 !important;
 }
