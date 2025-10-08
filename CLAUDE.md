@@ -10,11 +10,13 @@ Chocoart is a Laravel 12 web application for an artisanal chocolate business. Th
 
 All design work MUST follow the brand manual specifications:
 
-**Colors (defined in CSS variables):**
-- Pink: `#e28dc4` - Primary brand color
-- Aqua: `#81cacf` - Secondary brand color
-- Lime: `#c6d379` - Accent color
-- Chocolate: `#5f3917` - Text and dark elements
+**Colors:**
+- Pink: `#e28dc4` (var `--rosa`) - Primary brand color
+- Aqua: `#81cacf` (var `--menta`) - Secondary brand color
+- Lime: `#c6d379` (var `--pistacho`) - Accent color
+- Chocolate: `#5f3917` (var `--choco`) - Text and dark elements
+
+Note: Some templates use inline CSS custom properties, others hardcode hex values. Prefer CSS variables for consistency.
 
 **Typography:**
 - Primary: Poppins (headings, body)
@@ -23,8 +25,10 @@ All design work MUST follow the brand manual specifications:
 
 **Visual Style:**
 - "Liquid" design with organic, flowing shapes
-- Animated morphing blob backgrounds
+- SVG wave dividers between sections
+- Animated rotating text rings around product capsules
 - Gradient combinations of brand colors
+- Decorative elements: scalloped borders, floating animations, morphing shapes
 
 ## Key Commands
 
@@ -91,32 +95,42 @@ composer install
 
 ### Frontend Structure
 
+**Asset Pipeline:**
+- Uses Vite for asset compilation with Tailwind CSS 4
+- Entry points: `resources/css/app.css` and `resources/js/app.js`
+- Assets referenced via `@vite()` directive in layouts
+- Custom styles embedded in Blade templates using `<style>` blocks with Tailwind utility classes
+
 **Blade Templates:**
-- `resources/views/layouts/app.blade.php` - Master layout with navigation, footer, and asset includes
-- `resources/views/home.blade.php` - Homepage extending master layout
+- `resources/views/layouts/app.blade.php` - Master layout with:
+  - Top bar with contact info and social links
+  - Sticky navigation with mobile menu toggle
+  - Footer with wave divider SVG
+  - Google Fonts: Poppins, Dancing Script, Quicksand
+  - Mobile menu collapse functionality
+- `resources/views/home.blade.php` - One-page design with all sections
+- Additional views: `productos.blade.php`, `cursos.blade.php`, `galeria.blade.php`, `contacto.blade.php`
 
-**Assets:**
-- `public/css/style.css` - All styles with CSS variables for brand colors
-- `public/js/script.js` - Interactions including:
-  - Mobile menu toggle
-  - Smooth scrolling
-  - Intersection Observer animations
-  - Form handling with success messages
-  - Parallax effects for liquid shapes
-  - Product card 3D tilt effects
-  - Gallery lightbox
+**JavaScript Assets:**
+- `public/js/animations.js` - Brand-specific animations referenced in layout
+- Inline scripts for interactive components (modal, carousel, menu toggle)
 
-**Key CSS Patterns:**
-- Liquid shape animations use `@keyframes morph` with organic border-radius transitions
-- Brand colors accessed via CSS custom properties (`var(--color-pink)`, etc.)
-- Responsive breakpoints: 1024px, 768px, 480px
-- Mobile-first grid layouts with `grid-template-columns: repeat(auto-fit, minmax(...))`
+**Styling Approach:**
+- Tailwind CSS 4 utility-first classes as primary styling method
+- Inline `<style>` blocks for component-specific animations and brand colors
+- CSS custom properties in `:root` for brand consistency
+- Responsive design with Tailwind breakpoints (sm, md, lg)
 
 ### Backend Structure
 
 **Routes (`routes/web.php`):**
-- `GET /` - Homepage (renders `home` view)
-- `POST /contacto` - Contact form submission (currently basic redirect, needs implementation)
+All routes currently use closures (no controllers):
+- `GET /` → `home` view (route name: `home`)
+- `GET /productos` → `productos` view (route name: `productos`)
+- `GET /cursos` → `cursos` view (route name: `cursos`)
+- `GET /galeria` → `galeria` view (route name: `galeria`)
+- `GET /contacto` → `contacto` view (route name: `contacto`)
+- `POST /contacto` → Basic redirect (route name: `contacto.store`) - **TODO: needs implementation**
 
 **Views Pattern:**
 ```blade
@@ -125,6 +139,10 @@ composer install
 @section('content')
     <!-- Page content -->
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/script.js') }}"></script>
+@endpush
 ```
 
 ### Contact Form Implementation Notes
@@ -133,7 +151,7 @@ The contact form currently redirects back with a success message but doesn't pro
 
 1. Create a controller: `php artisan make:controller ContactController`
 2. Add validation and email sending logic
-3. Update route to use controller method
+3. Update route in `routes/web.php` to use controller method
 4. Configure mail settings in `.env`
 
 ## Development Workflow
@@ -147,18 +165,24 @@ The contact form currently redirects back with a success message but doesn't pro
 
 ### Styling Guidelines
 
-- Always use CSS custom properties for brand colors (never hardcode hex values outside `:root`)
+- Primary approach: Tailwind CSS 4 utility classes
+- Brand colors: Use Tailwind bracket notation `[#e28dc4]` or CSS custom properties when defined
 - Maintain liquid/organic design aesthetic with flowing shapes
-- Use gradients combining 2-3 brand colors
-- Add smooth transitions (`var(--transition)`)
-- Ensure mobile responsiveness
+- Use gradients combining 2-3 brand colors (e.g., `bg-gradient-to-br from-[#e28dc4] to-[#81cacf]`)
+- Component-specific animations go in inline `<style>` blocks with `@keyframes`
+- Ensure mobile responsiveness with Tailwind breakpoints
+- Common patterns:
+  - Rounded corners: `rounded-full`, `rounded-2xl`, `rounded-xl`
+  - Shadows: `shadow-lg`, `shadow-xl`, `shadow-2xl`
+  - Transitions: `transition-all duration-300`, `transition-colors duration-300`
 
 ### JavaScript Patterns
 
-- Event delegation for dynamic content
-- Intersection Observer for scroll animations
+- Inline scripts using IIFEs: `(() => { /* code */ })()`
+- Event listeners for interactive elements (modals, carousels, menu toggles)
+- Accessibility attributes: `aria-label`, `aria-expanded`, `aria-current`
 - Form submissions include CSRF token (`@csrf`)
-- Success messages use inline styles with brand gradients
+- Keyboard navigation support (Escape to close, Arrow keys for carousels)
 
 ## Environment Setup
 
@@ -185,12 +209,37 @@ This project runs in XAMPP environment:
 - Access via: `http://localhost/chocoart/public`
 - Ensure Apache and MySQL are running
 
+## Important Implementation Notes
+
+### Interactive Components
+
+**Product Modal with Carousel:**
+- Located in `home.blade.php` products section
+- Triggered by `.open-modal` buttons with `data-*` attributes
+- Carousel supports touch/swipe on mobile
+- Images array passed via `data-images` JSON attribute
+- Modal styling uses gradient card (`card-choco-rose` class)
+
+**SVG Patterns:**
+- Wave dividers: Use `<path>` with curves for organic section transitions
+- Text rings: Circular `<textPath>` with rotating animation
+- Decorative frames: Organic blob shapes using SVG paths
+
+### Asset References
+
+Use Laravel asset helpers for all resources:
+- Images: `{{ asset('images/filename.png') }}`
+- Videos: `{{ asset('videos/filename.mp4') }}`
+- JavaScript: `{{ asset('js/filename.js') }}`
+- Routes: `{{ route('route.name') }}`
+
 ## Brand Consistency Checklist
 
 When adding features, verify:
-- [ ] Uses defined brand colors from CSS variables
+- [ ] Uses brand color hex values or CSS custom properties
 - [ ] Typography follows Poppins/Dancing Script/Quicksand pattern
-- [ ] Includes liquid/organic shape elements where appropriate
+- [ ] Includes liquid/organic shape elements where appropriate (SVG waves, rounded shapes)
 - [ ] Maintains visual consistency with existing sections
-- [ ] Responsive across breakpoints
-- [ ] Smooth animations using defined transitions
+- [ ] Responsive across breakpoints (mobile-first approach)
+- [ ] Smooth animations using Tailwind transitions or custom `@keyframes`
+- [ ] Accessibility: proper ARIA labels, keyboard navigation, semantic HTML

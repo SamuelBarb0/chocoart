@@ -7,7 +7,27 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-// Contact form submission (optional - you can create a controller later)
+// Productos
+Route::get('/productos', function () {
+    return view('productos');
+})->name('productos');
+
+// Cursos
+Route::get('/cursos', function () {
+    return view('cursos');
+})->name('cursos');
+
+// Galería
+Route::get('/galeria', function () {
+    return view('galeria');
+})->name('galeria');
+
+// Contacto
+Route::get('/contacto', function () {
+    return view('contacto');
+})->name('contacto');
+
+// Contact form submission
 Route::post('/contacto', function () {
     // TODO: Process contact form
     return redirect()->back()->with('success', 'Mensaje enviado correctamente');
