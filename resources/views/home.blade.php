@@ -23,7 +23,7 @@
       <div class="relative mx-auto mb-8">
         <div class="relative mx-auto h-40 md:h-52 lg:h-64 w-auto">
           <img
-            src="{{ asset('images/LC_1Logo ChocoArt.png') }}"
+            src="{{ asset('images/LC_6Logo ChocoArt.png') }}"
             alt="Chocoart"
             class="hero-logo absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
                    h-[150%] md:h-[160%] lg:h-[185%] w-auto
@@ -32,7 +32,7 @@
       </div>
 
       <!-- Slogan -->
-      <h1 class="font-['Dancing_Script'] text-4xl md:text-5xl lg:text-6xl text-[#e28dc4] mb-6 drop-shadow-lg">
+      <h1 class="font-['Dancing_Script'] text-4xl md:text-5xl lg:text-6xl text-[#81cacf] mb-6 drop-shadow-lg">
         Arte con Chocolate
       </h1>
 
@@ -62,8 +62,15 @@
     </div>
   </div>
 
-  <!-- Wave Divider Bottom -->
-  <div class="absolute -bottom-1 left-0 w-full z-10">
+  <!-- Wave Divider Bottom - Mobile (sutiles) -->
+  <div class="lg:hidden absolute -bottom-1 left-0 w-full z-10 overflow-hidden">
+    <svg class="w-full h-20 md:h-24" viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,60 Q50,20 100,60 T200,60 T300,60 T400,60 T500,60 T600,60 T700,60 T800,60 T900,60 T1000,60 T1100,60 T1200,60 L1200,120 L0,120 Z" fill="white"/>
+    </svg>
+  </div>
+
+  <!-- Wave Divider Bottom - Desktop (pronunciadas) -->
+  <div class="hidden lg:block absolute -bottom-1 left-0 w-full z-10 overflow-hidden">
     <svg class="w-full h-16 md:h-20" viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M0,30 Q15,0 30,30 T60,30 T90,30 T120,30 T150,30 T180,30 T210,30 T240,30 T270,30 T300,30 T330,30 T360,30 T390,30 T420,30 T450,30 T480,30 T510,30 T540,30 T570,30 T600,30 T630,30 T660,30 T690,30 T720,30 T750,30 T780,30 T810,30 T840,30 T870,30 T900,30 T930,30 T960,30 T990,30 T1020,30 T1050,30 T1080,30 T1110,30 T1140,30 T1170,30 T1200,30 L1200,60 L0,60 Z" fill="white"/>
     </svg>
@@ -144,10 +151,17 @@
 
 <!-- Productos Preview Section -->
 <section class="relative py-20 bg-gradient-to-b from-white to-pink-50">
-  <!-- Wave divider top -->
-  <div class="absolute -top-1 left-0 w-full overflow-hidden leading-none rotate-180">
-    <svg class="relative block w-full h-16 md:h-20" viewBox="0 0 1200 120" preserveAspectRatio="none">
-      <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="white"></path>
+  <!-- Wave divider top - Mobile (sutiles) -->
+  <div class="lg:hidden absolute -top-1 left-0 w-full overflow-hidden rotate-180">
+    <svg class="w-full h-20 md:h-24" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,60 Q50,20 100,60 T200,60 T300,60 T400,60 T500,60 T600,60 T700,60 T800,60 T900,60 T1000,60 T1100,60 T1200,60 L1200,120 L0,120 Z" fill="white"></path>
+    </svg>
+  </div>
+
+  <!-- Wave divider top - Desktop (pronunciadas) -->
+  <div class="hidden lg:block absolute -top-1 left-0 w-full overflow-hidden rotate-180">
+    <svg class="w-full h-16 md:h-20" viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path d="M0,30 Q15,0 30,30 T60,30 T90,30 T120,30 T150,30 T180,30 T210,30 T240,30 T270,30 T300,30 T330,30 T360,30 T390,30 T420,30 T450,30 T480,30 T510,30 T540,30 T570,30 T600,30 T630,30 T660,30 T690,30 T720,30 T750,30 T780,30 T810,30 T840,30 T870,30 T900,30 T930,30 T960,30 T990,30 T1020,30 T1050,30 T1080,30 T1110,30 T1140,30 T1170,30 T1200,30 L1200,60 L0,60 Z" fill="white"></path>
     </svg>
   </div>
 
@@ -215,9 +229,16 @@
 
 <!-- Cursos Preview Section -->
 <section class="relative py-20 bg-gradient-to-b from-[#81cacf] to-[#c6d379] overflow-hidden">
-  <!-- Scalloped border top -->
-  <div class="absolute -top-1 left-0 w-full z-10">
-    <svg class="w-full h-16" viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Scalloped border top - Mobile (sutiles) -->
+  <div class="lg:hidden absolute -top-1 left-0 w-full z-10 overflow-hidden">
+    <svg class="w-full h-20 md:h-24" viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,60 Q50,100 100,60 T200,60 T300,60 T400,60 T500,60 T600,60 T700,60 T800,60 T900,60 T1000,60 T1100,60 T1200,60 L1200,0 L0,0 Z" fill="#fdf2f8" />
+    </svg>
+  </div>
+
+  <!-- Scalloped border top - Desktop (pronunciadas) -->
+  <div class="hidden lg:block absolute -top-1 left-0 w-full z-10 overflow-hidden">
+    <svg class="w-full h-16 md:h-20" viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M0,30 Q15,60 30,30 T60,30 T90,30 T120,30 T150,30 T180,30 T210,30 T240,30 T270,30 T300,30 T330,30 T360,30 T390,30 T420,30 T450,30 T480,30 T510,30 T540,30 T570,30 T600,30 T630,30 T660,30 T690,30 T720,30 T750,30 T780,30 T810,30 T840,30 T870,30 T900,30 T930,30 T960,30 T990,30 T1020,30 T1050,30 T1080,30 T1110,30 T1140,30 T1170,30 T1200,30 L1200,0 L0,0 Z" fill="#fdf2f8" />
     </svg>
   </div>
@@ -280,9 +301,16 @@
     </div>
   </div>
 
-  <!-- Scalloped border bottom -->
-  <div class="absolute -bottom-1 left-0 w-full z-10">
-    <svg class="w-full h-16" viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Scalloped border bottom - Mobile (sutiles) -->
+  <div class="lg:hidden absolute -bottom-1 left-0 w-full z-10 overflow-hidden">
+    <svg class="w-full h-20 md:h-24" viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,60 Q50,20 100,60 T200,60 T300,60 T400,60 T500,60 T600,60 T700,60 T800,60 T900,60 T1000,60 T1100,60 T1200,60 L1200,120 L0,120 Z" fill="white" />
+    </svg>
+  </div>
+
+  <!-- Scalloped border bottom - Desktop (pronunciadas) -->
+  <div class="hidden lg:block absolute -bottom-1 left-0 w-full z-10 overflow-hidden">
+    <svg class="w-full h-16 md:h-20" viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M0,30 Q15,0 30,30 T60,30 T90,30 T120,30 T150,30 T180,30 T210,30 T240,30 T270,30 T300,30 T330,30 T360,30 T390,30 T420,30 T450,30 T480,30 T510,30 T540,30 T570,30 T600,30 T630,30 T660,30 T690,30 T720,30 T750,30 T780,30 T810,30 T840,30 T870,30 T900,30 T930,30 T960,30 T990,30 T1020,30 T1050,30 T1080,30 T1110,30 T1140,30 T1170,30 T1200,30 L1200,60 L0,60 Z" fill="white" />
     </svg>
   </div>
@@ -341,11 +369,18 @@
 </section>
 
 <!-- Contact CTA Section -->
-<section class="relative py-20 bg-gradient-to-b from-white to-pink-50">
-  <!-- Wave divider top -->
-  <div class="absolute -top-1 left-0 w-full overflow-hidden leading-none rotate-180">
-    <svg class="relative block w-full h-16 md:h-20" viewBox="0 0 1200 120" preserveAspectRatio="none">
-      <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="white"></path>
+<section class="relative py-20 bg-white">
+  <!-- Wave divider top - Mobile (sutiles) -->
+  <div class="lg:hidden absolute -top-1 left-0 w-full overflow-hidden rotate-180">
+    <svg class="w-full h-20 md:h-24" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,60 Q50,20 100,60 T200,60 T300,60 T400,60 T500,60 T600,60 T700,60 T800,60 T900,60 T1000,60 T1100,60 T1200,60 L1200,120 L0,120 Z" fill="white"></path>
+    </svg>
+  </div>
+
+  <!-- Wave divider top - Desktop (pronunciadas) -->
+  <div class="hidden lg:block absolute -top-1 left-0 w-full overflow-hidden rotate-180">
+    <svg class="w-full h-16 md:h-20" viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path d="M0,30 Q15,0 30,30 T60,30 T90,30 T120,30 T150,30 T180,30 T210,30 T240,30 T270,30 T300,30 T330,30 T360,30 T390,30 T420,30 T450,30 T480,30 T510,30 T540,30 T570,30 T600,30 T630,30 T660,30 T690,30 T720,30 T750,30 T780,30 T810,30 T840,30 T870,30 T900,30 T930,30 T960,30 T990,30 T1020,30 T1050,30 T1080,30 T1110,30 T1140,30 T1170,30 T1200,30 L1200,60 L0,60 Z" fill="white"></path>
     </svg>
   </div>
 
