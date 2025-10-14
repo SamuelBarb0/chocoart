@@ -104,25 +104,28 @@
   <div class="container-choco">
     <div class="text-center mb-16">
       <h2 class="font-['Dancing_Script'] text-4xl md:text-5xl lg:text-6xl text-[var(--rosa)] mb-3">
-        I Catálogo de Chocolates I
+        Catálogo de Chocolates
       </h2>
       <p class="text-gray-600 max-w-2xl mx-auto text-lg">
         Explora nuestra colección de chocolates artesanales premium
       </p>
     </div>
 
+    @if($productos->count() > 0)
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-
-      <!-- ===== PRODUCTO 1 - Bombón Menta ===== -->
+      @foreach($productos as $index => $producto)
+      <!-- Producto {{ $producto->name }} -->
       <div class="group relative">
         <div class="relative mb-6">
+          @if($producto->featured)
           <!-- Badge -->
           <div class="absolute -top-3 right-1/4 z-30">
             <div class="relative px-4 py-1 bg-[var(--pistacho)] text-white text-xs font-bold rounded-full shadow-lg">
-              NUEVO
+              DESTACADO
               <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[var(--pistacho)]"></div>
             </div>
           </div>
+          @endif
 
           <!-- Cápsula + Aro -->
           <div class="relative w-56 h-56 mx-auto isolate">
@@ -132,420 +135,236 @@
             <svg viewBox="0 0 200 200" class="ring-wrap absolute inset-0 z-20 pointer-events-none transition-transform duration-300"
                  aria-hidden="true"
                  style="--ring-hover:6s; mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%); -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%);">
-              <defs><path id="circlePath-1" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/></defs>
+              <defs><path id="circlePath-{{ $index }}" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/></defs>
               <g class="text-ring">
                 <text font-size="14.5" font-weight="600" fill="var(--choco)" letter-spacing="3">
-                  <textPath href="#circlePath-1">• CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART •</textPath>
+                  <textPath href="#circlePath-{{ $index }}">• CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART •</textPath>
                 </text>
               </g>
               <circle cx="100" cy="100" r="90" fill="none" stroke="var(--choco)" stroke-width="1.5" opacity=".25"/>
             </svg>
 
-            <!-- Cápsula -->
-            <div class="capsule relative z-10 w-full h-full bg-gradient-to-br from-[color-mix(in_srgb,var(--menta) 50%,white_0%)] to-[color-mix(in_srgb,var(--menta) 10%,var(--choco) 90%)] rounded-full shadow-2xl flex items-center justify-center transition-transform duration-500">
-              <div class="emoji text-7xl transition-transform duration-300">🍫</div>
+            <!-- Cápsula con imagen o icono -->
+            @php
+              $mainImage = $producto->image_url ?? $producto->icon_url;
+            @endphp
+
+            <div class="capsule relative z-10 w-full h-full bg-gradient-to-br {{ $producto->gradient }} rounded-full shadow-2xl flex items-center justify-center transition-transform duration-500 overflow-hidden">
+              @if($mainImage)
+                <img src="{{ $mainImage }}" alt="{{ $producto->name }}" class="w-full h-full object-cover" loading="lazy">
+              @elseif($producto->icon)
+                <div class="emoji text-7xl transition-transform duration-300">{{ $producto->icon }}</div>
+              @else
+                <div class="emoji text-7xl transition-transform duration-300">🍫</div>
+              @endif
             </div>
           </div>
         </div>
 
         <div class="text-center">
-          <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">Bombón Menta</h3>
-          <p class="text-gray-500 text-sm mb-3">Refrescante sabor a menta</p>
+          <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">{{ $producto->name }}</h3>
+          <p class="text-gray-500 text-sm mb-1">{{ $producto->category }}</p>
+          @if($producto->price)
+          <p class="text-[var(--rosa)] font-bold text-lg mb-3">
+            ${{ number_format($producto->price, 0, ',', '.') }}
+          </p>
+          @else
+          <p class="text-gray-400 text-sm mb-3">&nbsp;</p>
+          @endif
+
           <button
             type="button"
             class="open-modal btn-choco focus-ring inline-block px-6 py-2 rounded-full font-semibold transition"
-            data-title="Bombón Menta"
-            data-subtitle="Refrescante, equilibrado y aromático"
-            data-desc="El frescor de la menta natural se fusiona con cacao de origen para una sensación ligera y vivaz."
-            data-bullets='["70% cacao fino de aroma","Esencia natural de menta","Textura cremosa","Sin colorantes artificiales"]'
-            data-notes="Marida con: té verde, cítricos o espresso corto."
-            data-images='[]'
-          >Leer Más</button>
+            data-title="{{ $producto->name }}"
+            data-subtitle="{{ $producto->category }}"
+            data-desc="{{ strip_tags($producto->description) }}"
+            data-bullets='[]'
+            data-notes=""
+            data-images='@json($producto->images_urls)'
+          >Ver Detalles</button>
         </div>
       </div>
-
-      <!-- ===== PRODUCTO 2 - Bombón Frambuesa ===== -->
-      <div class="group relative">
-        <div class="relative mb-6">
-          <div class="absolute -top-3 right-1/4 z-30">
-            <div class="relative px-4 py-1 bg-[var(--choco)] text-white text-xs font-bold rounded-full shadow-lg">
-              DESTACADO
-              <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[var(--choco)]"></div>
-            </div>
-          </div>
-
-          <div class="relative w-56 h-56 mx-auto isolate">
-            <div class="absolute inset-0 rounded-full blur-2xl" style="background: radial-gradient(60% 60% at 30% 20%, color-mix(in srgb, var(--rosa) 35%, white 0%) 0%, transparent 70%), radial-gradient(60% 60% at 70% 80%, color-mix(in srgb, var(--choco) 30%, white 0%) 0%, transparent 70%);"></div>
-
-            <svg viewBox="0 0 200 200" class="ring-wrap absolute inset-0 z-20 pointer-events-none transition-transform duration-300"
-                 aria-hidden="true"
-                 style="--ring-hover:6s; mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%); -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%);">
-              <defs><path id="circlePath-2" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/></defs>
-              <g class="text-ring fast">
-                <text font-size="14.5" font-weight="600" fill="var(--choco)" letter-spacing="3">
-                  <textPath href="#circlePath-2">• CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART •</textPath>
-                </text>
-              </g>
-              <circle cx="100" cy="100" r="90" fill="none" stroke="var(--choco)" stroke-width="1.5" opacity=".25"/>
-            </svg>
-
-            <div class="capsule relative z-10 w-full h-full bg-gradient-to-br from-[color-mix(in_srgb,var(--rosa) 35%,white_0%)] to-[color-mix(in_srgb,var(--choco) 85%,white_0%)] rounded-full shadow-2xl flex items-center justify-center transition-transform duration-500">
-              <div class="emoji text-7xl transition-transform duration-300">🍫</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center">
-          <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">Bombón Frambuesa</h3>
-          <p class="text-gray-500 text-sm mb-3">Dulce y afrutado</p>
-          <button
-            type="button"
-            class="open-modal btn-choco focus-ring inline-block px-6 py-2 rounded-full font-semibold transition"
-            data-title="Bombón Frambuesa"
-            data-subtitle="Frutal, vibrante y seductor"
-            data-desc="La frambuesa liofilizada aporta un toque ácido-dulce que realza las notas del cacao."
-            data-bullets='["Cacao 60% afrutado","Frambuesa liofilizada premium","Crujiente en cada bocado","Perfil intenso"]'
-            data-notes="Marida con: vino rosado fresco o espumante."
-            data-images='[]'
-          >Leer Más</button>
-        </div>
-      </div>
-
-      <!-- ===== PRODUCTO 3 - Bombón Mango ===== -->
-      <div class="group relative">
-        <div class="relative mb-6">
-          <div class="absolute -top-3 right-1/4 z-30">
-            <div class="relative px-4 py-1 bg-[var(--pistacho)] text-white text-xs font-bold rounded-full shadow-lg">
-              NUEVO
-              <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[var(--pistacho)]"></div>
-            </div>
-          </div>
-
-          <div class="relative w-56 h-56 mx-auto isolate">
-            <div class="absolute inset-0 rounded-full blur-2xl" style="background: radial-gradient(60% 60% at 30% 20%, color-mix(in srgb, var(--pistacho) 35%, white 0%) 0%, transparent 70%), radial-gradient(60% 60% at 70% 80%, color-mix(in srgb, var(--menta) 30%, white 0%) 0%, transparent 70%);"></div>
-
-            <svg viewBox="0 0 200 200" class="ring-wrap absolute inset-0 z-20 pointer-events-none transition-transform duration-300"
-                 aria-hidden="true"
-                 style="--ring-hover:6.5s; mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%); -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%);">
-              <defs><path id="circlePath-3" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/></defs>
-              <g class="text-ring slow">
-                <text font-size="14.5" font-weight="600" fill="var(--choco)" letter-spacing="3">
-                  <textPath href="#circlePath-3">• CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART •</textPath>
-                </text>
-              </g>
-              <circle cx="100" cy="100" r="90" fill="none" stroke="var(--choco)" stroke-width="1.5" opacity=".25"/>
-            </svg>
-
-            <div class="capsule relative z-10 w-full h-full bg-gradient-to-br from-[color-mix(in_srgb,var(--pistacho) 35%,white_0%)] to-[color-mix(in_srgb,var(--choco) 85%,white_0%)] rounded-full shadow-2xl flex items-center justify-center transition-transform duration-500">
-              <div class="emoji text-7xl transition-transform duration-300">🍫</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center">
-          <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">Bombón Mango</h3>
-          <p class="text-gray-500 text-sm mb-3">Tropical y exótico</p>
-          <button
-            type="button"
-            class="open-modal btn-choco focus-ring inline-block px-6 py-2 rounded-full font-semibold transition"
-            data-title="Bombón Mango"
-            data-subtitle="Exótico, jugoso y solar"
-            data-desc="Notas tropicales de mango con cacao medio; dulzor natural y final prolongado."
-            data-bullets='["Cacao 55% balanceado","Tropezones de mango","Aroma tropical","Perfecto para días cálidos"]'
-            data-notes="Marida con: limonadas, cervezas ligeras o helado de vainilla."
-            data-images='[]'
-          >Leer Más</button>
-        </div>
-      </div>
-
-      <!-- ===== PRODUCTO 4 - Tableta Caramelo Salado ===== -->
-      <div class="group relative">
-        <div class="relative mb-6">
-          <div class="absolute -top-3 right-1/4 z-30">
-            <div class="relative px-4 py-1 bg-[var(--rosa)] text-white text-xs font-bold rounded-full shadow-lg">
-              PREMIUM
-              <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[var(--rosa)]"></div>
-            </div>
-          </div>
-
-          <div class="relative w-56 h-56 mx-auto isolate">
-            <div class="absolute inset-0 rounded-full blur-2xl" style="background: radial-gradient(60% 60% at 30% 20%, color-mix(in srgb, var(--choco) 35%, white 0%) 0%, transparent 70%), radial-gradient(60% 60% at 70% 80%, color-mix(in srgb, var(--rosa) 30%, white 0%) 0%, transparent 70%);"></div>
-
-            <svg viewBox="0 0 200 200" class="ring-wrap absolute inset-0 z-20 pointer-events-none transition-transform duration-300"
-                 aria-hidden="true"
-                 style="--ring-hover:7s; mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%); -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%);">
-              <defs><path id="circlePath-4" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/></defs>
-              <g class="text-ring">
-                <text font-size="14.5" font-weight="600" fill="var(--choco)" letter-spacing="3">
-                  <textPath href="#circlePath-4">• CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART •</textPath>
-                </text>
-              </g>
-              <circle cx="100" cy="100" r="90" fill="none" stroke="var(--choco)" stroke-width="1.5" opacity=".25"/>
-            </svg>
-
-            <div class="capsule relative z-10 w-full h-full bg-gradient-to-br from-[color-mix(in_srgb,var(--choco) 40%,white_0%)] to-[color-mix(in_srgb,var(--rosa) 35%,var(--choco) 65%)] rounded-full shadow-2xl flex items-center justify-center transition-transform duration-500">
-              <div class="emoji text-7xl transition-transform duration-300">🍫</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center">
-          <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">Tableta Caramelo Salado</h3>
-          <p class="text-gray-500 text-sm mb-3">Dulce con toque de sal</p>
-          <button
-            type="button"
-            class="open-modal btn-choco focus-ring inline-block px-6 py-2 rounded-full font-semibold transition"
-            data-title="Tableta Caramelo Salado"
-            data-subtitle="Equilibrio perfecto dulce-salado"
-            data-desc="Chocolate oscuro con caramelo artesanal y flor de sal marina. Una combinación adictiva."
-            data-bullets='["Cacao 65% de origen único","Caramelo artesanal","Flor de sal marina","Textura crujiente"]'
-            data-notes="Marida con: café negro, whisky o cerveza porter."
-            data-images='[]'
-          >Leer Más</button>
-        </div>
-      </div>
-
-      <!-- ===== PRODUCTO 5 - Trufa Avellanas ===== -->
-      <div class="group relative">
-        <div class="relative mb-6">
-          <div class="absolute -top-3 right-1/4 z-30">
-            <div class="relative px-4 py-1 bg-[var(--menta)] text-white text-xs font-bold rounded-full shadow-lg">
-              CLÁSICO
-              <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[var(--menta)]"></div>
-            </div>
-          </div>
-
-          <div class="relative w-56 h-56 mx-auto isolate">
-            <div class="absolute inset-0 rounded-full blur-2xl" style="background: radial-gradient(60% 60% at 30% 20%, color-mix(in srgb, var(--menta) 35%, white 0%) 0%, transparent 70%), radial-gradient(60% 60% at 70% 80%, color-mix(in srgb, var(--choco) 30%, white 0%) 0%, transparent 70%);"></div>
-
-            <svg viewBox="0 0 200 200" class="ring-wrap absolute inset-0 z-20 pointer-events-none transition-transform duration-300"
-                 aria-hidden="true"
-                 style="--ring-hover:6s; mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%); -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%);">
-              <defs><path id="circlePath-5" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/></defs>
-              <g class="text-ring fast">
-                <text font-size="14.5" font-weight="600" fill="var(--choco)" letter-spacing="3">
-                  <textPath href="#circlePath-5">• CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART •</textPath>
-                </text>
-              </g>
-              <circle cx="100" cy="100" r="90" fill="none" stroke="var(--choco)" stroke-width="1.5" opacity=".25"/>
-            </svg>
-
-            <div class="capsule relative z-10 w-full h-full bg-gradient-to-br from-[color-mix(in_srgb,var(--menta) 30%,white_0%)] to-[color-mix(in_srgb,var(--choco) 90%,white_0%)] rounded-full shadow-2xl flex items-center justify-center transition-transform duration-500">
-              <div class="emoji text-7xl transition-transform duration-300">🍬</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center">
-          <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">Trufa Avellanas</h3>
-          <p class="text-gray-500 text-sm mb-3">Cremosa y crujiente</p>
-          <button
-            type="button"
-            class="open-modal btn-choco focus-ring inline-block px-6 py-2 rounded-full font-semibold transition"
-            data-title="Trufa Avellanas"
-            data-subtitle="Cremosidad irresistible"
-            data-desc="Ganache de chocolate con leche y avellanas tostadas. Cubierta de cacao en polvo."
-            data-bullets='["Chocolate con leche 40%","Avellanas piamonte tostadas","Ganache sedoso","Acabado en cacao puro"]'
-            data-notes="Marida con: champagne, café con leche o té chai."
-            data-images='[]'
-          >Leer Más</button>
-        </div>
-      </div>
-
-      <!-- ===== PRODUCTO 6 - Figura Corazón ===== -->
-      <div class="group relative">
-        <div class="relative mb-6">
-          <div class="absolute -top-3 right-1/4 z-30">
-            <div class="relative px-4 py-1 bg-[var(--rosa)] text-white text-xs font-bold rounded-full shadow-lg">
-              ESPECIAL
-              <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-[var(--rosa)]"></div>
-            </div>
-          </div>
-
-          <div class="relative w-56 h-56 mx-auto isolate">
-            <div class="absolute inset-0 rounded-full blur-2xl" style="background: radial-gradient(60% 60% at 30% 20%, color-mix(in srgb, var(--rosa) 40%, white 0%) 0%, transparent 70%), radial-gradient(60% 60% at 70% 80%, color-mix(in srgb, var(--pistacho) 30%, white 0%) 0%, transparent 70%);"></div>
-
-            <svg viewBox="0 0 200 200" class="ring-wrap absolute inset-0 z-20 pointer-events-none transition-transform duration-300"
-                 aria-hidden="true"
-                 style="--ring-hover:6.5s; mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%); -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 41%, black 43%);">
-              <defs><path id="circlePath-6" d="M100,100 m-86,0 a86,86 0 1,1 172,0 a86,86 0 1,1 -172,0"/></defs>
-              <g class="text-ring slow">
-                <text font-size="14.5" font-weight="600" fill="var(--choco)" letter-spacing="3">
-                  <textPath href="#circlePath-6">• CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART • CHOCO ART •</textPath>
-                </text>
-              </g>
-              <circle cx="100" cy="100" r="90" fill="none" stroke="var(--choco)" stroke-width="1.5" opacity=".25"/>
-            </svg>
-
-            <div class="capsule relative z-10 w-full h-full bg-gradient-to-br from-[color-mix(in_srgb,var(--rosa) 45%,white_0%)] to-[color-mix(in_srgb,var(--pistacho) 25%,var(--choco) 75%)] rounded-full shadow-2xl flex items-center justify-center transition-transform duration-500">
-              <div class="emoji text-7xl transition-transform duration-300">🎁</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center">
-          <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">Figura Personalizada</h3>
-          <p class="text-gray-500 text-sm mb-3">Para ocasiones especiales</p>
-          <button
-            type="button"
-            class="open-modal btn-choco focus-ring inline-block px-6 py-2 rounded-full font-semibold transition"
-            data-title="Figura Personalizada"
-            data-subtitle="Hecho a tu medida"
-            data-desc="Figuras de chocolate personalizadas para bodas, cumpleaños, eventos corporativos y más."
-            data-bullets='["Diseño personalizado","Chocolate premium a elegir","Tamaños variados","Empaque de regalo"]'
-            data-notes="Pedidos con 7 días de anticipación. Consulta por diseños especiales."
-            data-images='[]'
-          >Leer Más</button>
-        </div>
-      </div>
-
+      @endforeach
     </div>
-  </div>
-
-  <!-- ===== MODAL con CARRUSEL (paleta aplicada) ===== -->
-  <div id="productModal" class="fixed inset-0 z-[100] flex items-center justify-center modal-hidden transition-opacity duration-200">
-    <div id="modalBackdrop" class="absolute inset-0 bg-black/60"></div>
-
-    <div role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc"
-      class="modal-panel relative w-[92%] max-w-md mx-auto rounded-[28px] card-choco-rose inner-shadow soft-ring text-white transition-all duration-200 modal-panel-enter overflow-hidden">
-
-      <!-- Carrusel -->
-      <div class="relative">
-        <div class="aspect-[4/3] bg-black/10 overflow-hidden">
-          <img id="carouselImage" src="" alt="Galería del producto" class="w-full h-full object-cover">
-        </div>
-
-        <button id="prevBtn" class="carousel-arrow absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center" aria-label="Anterior">‹</button>
-        <button id="nextBtn" class="carousel-arrow absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center" aria-label="Siguiente">›</button>
-
-        <div id="carouselDots" class="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-2"></div>
-      </div>
-
-      <!-- Contenido -->
-      <div class="p-8 pt-6 text-center">
-        <h3 id="modalTitle" class="font-['Dancing_Script'] text-4xl leading-tight drop-shadow">Título</h3>
-        <p id="modalSubtitle" class="mt-1 text-white/85 italic">Subtítulo</p>
-
-        <p id="modalDesc" class="mt-4 text-sm leading-relaxed text-white/90">Descripción del producto…</p>
-
-        <ul id="modalBullets" class="mt-5 grid grid-cols-1 gap-2 text-white/90 text-sm"></ul>
-
-        <div id="modalNotes" class="mt-4 text-xs text-white/85 opacity-90">Notas, maridajes o conservación…</div>
-
-        <div class="mt-7 flex justify-center gap-3">
-          <a href="{{ route('contacto') }}" class="btn-outline-light focus-ring inline-flex items-center justify-center px-6 py-2 rounded-full soft-ring transition text-sm font-semibold">
-            Solicitar Pedido
-          </a>
-        </div>
-      </div>
-
-      <button id="modalClose" class="absolute top-3 right-3 text-white/85 hover:text-white transition" aria-label="Cerrar">✕</button>
+    @else
+    <!-- Sin productos -->
+    <div class="text-center py-16">
+      <div class="text-6xl mb-4">🍫</div>
+      <h3 class="text-2xl font-semibold text-gray-700 mb-2">Próximamente</h3>
+      <p class="text-gray-500">Estamos preparando deliciosos chocolates para ti</p>
     </div>
+    @endif
   </div>
-
-  <!-- ===== SCRIPT modal + carrusel ===== -->
-  <script>
-    (() => {
-      const modal = document.getElementById('productModal');
-      const panel = modal.querySelector('.modal-panel');
-      const backdrop = document.getElementById('modalBackdrop');
-      const closeBtn = document.getElementById('modalClose');
-
-      const titleEl = document.getElementById('modalTitle');
-      const subtitleEl = document.getElementById('modalSubtitle');
-      const descEl = document.getElementById('modalDesc');
-      const bulletsEl = document.getElementById('modalBullets');
-      const notesEl = document.getElementById('modalNotes');
-
-      const imgEl = document.getElementById('carouselImage');
-      const dotsEl = document.getElementById('carouselDots');
-      const prevBtn = document.getElementById('prevBtn');
-      const nextBtn = document.getElementById('nextBtn');
-
-      let images = [];
-      let index = 0;
-      let touchStartX = 0;
-
-      const openButtons = document.querySelectorAll('.open-modal');
-
-      function renderImage() {
-        if (!images.length) { imgEl.removeAttribute('src'); dotsEl.innerHTML=''; return; }
-        imgEl.src = images[index];
-
-        dotsEl.innerHTML = '';
-        images.forEach((_, i) => {
-          const b = document.createElement('button');
-          b.className = 'carousel-dot';
-          b.setAttribute('aria-label', 'Ir a la imagen ' + (i+1));
-          if (i === index) b.setAttribute('aria-current','true');
-          b.addEventListener('click', () => { index = i; renderImage(); });
-          dotsEl.appendChild(b);
-        });
-      }
-
-      function next(){ if(!images.length) return; index = (index+1) % images.length; renderImage(); }
-      function prev(){ if(!images.length) return; index = (index-1+images.length) % images.length; renderImage(); }
-
-      function openModalFromButton(btn){
-        // Texto
-        titleEl.textContent = btn.dataset.title || 'Producto';
-        subtitleEl.textContent = btn.dataset.subtitle || '';
-        descEl.textContent = btn.dataset.desc || '';
-        notesEl.textContent = btn.dataset.notes || '';
-
-        bulletsEl.innerHTML = '';
-        try{
-          const bullets = JSON.parse(btn.dataset.bullets || '[]');
-          bullets.forEach(t => {
-            const li = document.createElement('li');
-            li.className = 'flex items-center gap-2 justify-center';
-            li.innerHTML = `<span class="inline-block w-1.5 h-1.5 rounded-full" style="background: var(--menta)"></span><span>${t}</span>`;
-            bulletsEl.appendChild(li);
-          });
-        }catch(e){}
-
-        // Imágenes
-        try{ images = JSON.parse(btn.dataset.images || '[]'); }catch(e){ images = []; }
-        index = 0; renderImage();
-
-        // Mostrar
-        modal.classList.remove('modal-hidden'); modal.classList.add('modal-visible');
-        requestAnimationFrame(()=>{ panel.classList.remove('modal-panel-enter'); panel.classList.add('modal-panel-show'); });
-        document.addEventListener('keydown', onEsc);
-      }
-
-      function closeModal(){
-        panel.classList.remove('modal-panel-show'); panel.classList.add('modal-panel-enter');
-        modal.classList.remove('modal-visible'); modal.classList.add('modal-hidden');
-        document.removeEventListener('keydown', onEsc);
-      }
-      function onEsc(e){ if(e.key==='Escape') closeModal(); }
-
-      // Eventos
-      openButtons.forEach(btn => btn.addEventListener('click', () => openModalFromButton(btn)));
-      backdrop.addEventListener('click', closeModal);
-      closeBtn.addEventListener('click', closeModal);
-
-      nextBtn.addEventListener('click', next);
-      prevBtn.addEventListener('click', prev);
-      document.addEventListener('keydown', e => {
-        if(!modal.classList.contains('modal-visible')) return;
-        if(e.key==='ArrowRight') next();
-        if(e.key==='ArrowLeft') prev();
-      });
-
-      // Swipe móvil
-      imgEl.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
-      imgEl.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        if(Math.abs(dx)>40){ dx<0 ? next() : prev(); }
-      }, {passive:true});
-    })();
-  </script>
 </section>
 
-@endsection
+<!-- ===== MODAL TARJETA (fondo oscuro) ===== -->
+<div id="productModal" class="modal-hidden fixed inset-0 z-50 flex items-center justify-center px-4 transition-opacity duration-300"
+     style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);"
+     aria-labelledby="modalTitle"
+     aria-describedby="modalDesc"
+     aria-modal="true"
+     role="dialog">
+
+  <div class="modal-panel-enter card-choco-rose relative w-full max-w-3xl rounded-3xl text-white p-8 md:p-10 transition-all duration-300 inner-shadow soft-ring">
+    <button type="button" class="close-modal absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition focus-ring" aria-label="Cerrar modal">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <div class="flex flex-col md:flex-row gap-8">
+      <!-- Carrusel (izquierda) -->
+      <div class="md:w-5/12 flex-shrink-0">
+        <div class="relative rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm aspect-square">
+          <div id="carouselImages" class="w-full h-full"></div>
+
+          <!-- Controles (solo si >1 foto) -->
+          <div id="carouselControls" class="hidden">
+            <button type="button" id="prevBtn" class="carousel-arrow absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition focus-ring" aria-label="Imagen anterior">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button type="button" id="nextBtn" class="carousel-arrow absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition focus-ring" aria-label="Imagen siguiente">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div id="carouselDots" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido (derecha) -->
+      <div class="md:w-7/12 flex flex-col">
+        <h2 id="modalTitle" class="text-3xl md:text-4xl font-['Dancing_Script'] mb-1">Título</h2>
+        <p id="modalSubtitle" class="text-white/75 text-sm mb-4">Subtítulo</p>
+        <p id="modalDesc" class="text-white/90 leading-relaxed mb-6">Descripción</p>
+
+        <ul id="modalBullets" class="space-y-2 mb-6 text-white/85 text-sm"></ul>
+
+        <p id="modalNotes" class="text-white/70 text-sm italic border-t border-white/20 pt-4 mt-auto"></p>
+      </div>
+    </div>
+  </div>
+</div>
 
 @push('scripts')
-<script src="{{ asset('js/animations.js') }}"></script>
+<script>
+(() => {
+  const modal = document.getElementById('productModal');
+  const panel = modal?.querySelector('.card-choco-rose');
+  const title = document.getElementById('modalTitle');
+  const subtitle = document.getElementById('modalSubtitle');
+  const desc = document.getElementById('modalDesc');
+  const bullets = document.getElementById('modalBullets');
+  const notes = document.getElementById('modalNotes');
+  const carouselContainer = document.getElementById('carouselImages');
+  const controls = document.getElementById('carouselControls');
+  const dotsContainer = document.getElementById('carouselDots');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  let images = [];
+  let currentIndex = 0;
+
+  function openModal(data) {
+    title.textContent = data.title || '';
+    subtitle.textContent = data.subtitle || '';
+    desc.textContent = data.desc || '';
+
+    bullets.innerHTML = '';
+    if (data.bullets && data.bullets.length) {
+      data.bullets.forEach(b => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2';
+        li.innerHTML = `<span class="text-[var(--pistacho)] mt-1">✓</span><span>${b}</span>`;
+        bullets.appendChild(li);
+      });
+    }
+
+    notes.textContent = data.notes || '';
+    notes.style.display = data.notes ? 'block' : 'none';
+
+    images = data.images || [];
+    currentIndex = 0;
+    buildCarousel();
+
+    modal.classList.remove('modal-hidden');
+    modal.classList.add('modal-visible');
+    setTimeout(() => {
+      panel.classList.remove('modal-panel-enter');
+      panel.classList.add('modal-panel-show');
+    }, 10);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    panel.classList.remove('modal-panel-show');
+    panel.classList.add('modal-panel-enter');
+    setTimeout(() => {
+      modal.classList.remove('modal-visible');
+      modal.classList.add('modal-hidden');
+      document.body.style.overflow = '';
+    }, 250);
+  }
+
+  function buildCarousel() {
+    if (!images.length) {
+      carouselContainer.innerHTML = '<div class="w-full h-full flex items-center justify-center text-white/50 text-6xl">🍫</div>';
+      controls.classList.add('hidden');
+      return;
+    }
+
+    controls.classList.toggle('hidden', images.length <= 1);
+    showImage(0);
+    buildDots();
+  }
+
+  function showImage(index) {
+    currentIndex = index;
+    const src = images[index];
+    carouselContainer.innerHTML = `<img src="${src}" alt="Producto" class="w-full h-full object-cover" loading="lazy" />`;
+    updateDots();
+  }
+
+  function buildDots() {
+    dotsContainer.innerHTML = '';
+    images.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'carousel-dot focus-ring';
+      dot.setAttribute('aria-label', `Ir a imagen ${i + 1}`);
+      dot.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+      dot.addEventListener('click', () => showImage(i));
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  function updateDots() {
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+      dot.setAttribute('aria-current', i === currentIndex ? 'true' : 'false');
+    });
+  }
+
+  prevBtn?.addEventListener('click', () => showImage((currentIndex - 1 + images.length) % images.length));
+  nextBtn?.addEventListener('click', () => showImage((currentIndex + 1) % images.length));
+
+  document.querySelectorAll('.open-modal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const data = {
+        title: btn.dataset.title,
+        subtitle: btn.dataset.subtitle,
+        desc: btn.dataset.desc,
+        bullets: JSON.parse(btn.dataset.bullets || '[]'),
+        notes: btn.dataset.notes,
+        images: JSON.parse(btn.dataset.images || '[]'),
+      };
+      openModal(data);
+    });
+  });
+
+  document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+  modal?.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('modal-visible')) closeModal(); });
+})();
+</script>
 @endpush
+
+@endsection

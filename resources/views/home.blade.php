@@ -7,9 +7,14 @@
 <!-- Hero Banner Section -->
 <section id="inicio" class="relative overflow-hidden bg-gradient-to-br from-[#3d2817] via-[#5f3917] to-[#3d2817]">
   <!-- Fondo en video -->
+  @php
+    $heroVideo = \App\Models\Setting::get('home_hero_video', 'videos/Prueba.mp4');
+    // Si el video es de settings (subido), usar storage, sino usar asset normal
+    $videoPath = str_starts_with($heroVideo, 'settings/') ? asset('storage/' . $heroVideo) : asset($heroVideo);
+  @endphp
   <video
     class="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
-    src="{{ asset('videos/Prueba.mp4') }}"
+    src="{{ $videoPath }}"
     autoplay muted loop playsinline preload="metadata"></video>
 
   <!-- Overlay oscuro -->
@@ -33,16 +38,16 @@
 
       <!-- Slogan -->
       <h1 class="font-['Dancing_Script'] text-4xl md:text-5xl lg:text-6xl text-[#81cacf] mb-6 drop-shadow-lg">
-        Arte con Chocolate
+        {{ \App\Models\Setting::get('home_hero_title', 'Arte con Chocolate') }}
       </h1>
 
       <!-- Description -->
       <p class="text-xl md:text-2xl text-white/90 mb-4 max-w-3xl mx-auto leading-relaxed">
-        Creaciones artesanales que despiertan tus sentidos
+        {{ \App\Models\Setting::get('home_hero_subtitle', 'Creaciones artesanales que despiertan tus sentidos') }}
       </p>
 
       <p class="text-base md:text-lg text-white/75 mb-12 max-w-2xl mx-auto">
-        Cada pieza de chocolate es una obra de arte elaborada con pasión, dedicación y los mejores ingredientes premium
+        {{ \App\Models\Setting::get('home_hero_description', 'Cada pieza de chocolate es una obra de arte elaborada con pasión, dedicación y los mejores ingredientes premium') }}
       </p>
 
       <!-- CTA Buttons -->
@@ -90,15 +95,13 @@
   <div class="container-choco">
     <div class="max-w-4xl mx-auto text-center mb-12">
       <h2 class="text-3xl md:text-4xl lg:text-5xl font-['Dancing_Script'] text-[#5f3917] mb-6">
-        Sobre Nosotros
+        {{ \App\Models\Setting::get('home_about_title', 'Sobre Nosotros') }}
       </h2>
       <p class="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-        En <span class="font-semibold text-[#e28dc4]">Chocoart</span>, transformamos el chocolate en verdaderas obras de arte.
-        Cada pieza que creamos es el resultado de años de pasión, dedicación y perfeccionamiento de técnicas artesanales.
+        {{ \App\Models\Setting::get('home_about_text_1', 'En Chocoart, transformamos el chocolate en verdaderas obras de arte. Cada pieza que creamos es el resultado de años de pasión, dedicación y perfeccionamiento de técnicas artesanales.') }}
       </p>
       <p class="text-base md:text-lg text-gray-600 leading-relaxed">
-        Creemos que el chocolate es más que un simple dulce: es una experiencia sensorial que conecta emociones y crea momentos memorables.
-        Nuestro compromiso es utilizar solo ingredientes premium y trabajar con chocolate de origen sostenible.
+        {{ \App\Models\Setting::get('home_about_text_2', 'Creemos que el chocolate es más que un simple dulce: es una experiencia sensorial que conecta emociones y crea momentos memorables. Nuestro compromiso es utilizar solo ingredientes premium y trabajar con chocolate de origen sostenible.') }}
       </p>
     </div>
 
@@ -108,41 +111,41 @@
       <!-- Feature 1 -->
       <div class="text-center group">
         <div class="w-20 h-20 mx-auto mb-4 relative">
-          <div class="absolute inset-0 rounded-full bg-[#e28dc4] text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+          <div class="absolute inset-0 rounded-full text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300" style="background-color: {{ \App\Models\Setting::get('home_feature_1_icon', '#e28dc4') }}">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
               <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
           </div>
         </div>
-        <h3 class="text-xl font-semibold text-[#5f3917] mb-2">100% Artesanal</h3>
-        <p class="text-gray-600">Cada pieza elaborada con dedicación y amor por el chocolate</p>
+        <h3 class="text-xl font-semibold text-[#5f3917] mb-2">{{ \App\Models\Setting::get('home_feature_1_title', '100% Artesanal') }}</h3>
+        <p class="text-gray-600">{{ \App\Models\Setting::get('home_feature_1_description', 'Cada pieza elaborada con dedicación y amor por el chocolate') }}</p>
       </div>
 
       <!-- Feature 2 -->
       <div class="text-center group">
         <div class="w-20 h-20 mx-auto mb-4 relative">
-          <div class="absolute inset-0 rounded-full bg-[#81cacf] text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+          <div class="absolute inset-0 rounded-full text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300" style="background-color: {{ \App\Models\Setting::get('home_feature_2_icon', '#81cacf') }}">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
         </div>
-        <h3 class="text-xl font-semibold text-[#5f3917] mb-2">Ingredientes Premium</h3>
-        <p class="text-gray-600">Solo los mejores ingredientes para nuestras creaciones</p>
+        <h3 class="text-xl font-semibold text-[#5f3917] mb-2">{{ \App\Models\Setting::get('home_feature_2_title', 'Ingredientes Premium') }}</h3>
+        <p class="text-gray-600">{{ \App\Models\Setting::get('home_feature_2_description', 'Solo los mejores ingredientes para nuestras creaciones') }}</p>
       </div>
 
       <!-- Feature 3 -->
       <div class="text-center group">
         <div class="w-20 h-20 mx-auto mb-4 relative">
-          <div class="absolute inset-0 rounded-full bg-[#c6d379] text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+          <div class="absolute inset-0 rounded-full text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300" style="background-color: {{ \App\Models\Setting::get('home_feature_3_icon', '#c6d379') }}">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
             </svg>
           </div>
         </div>
-        <h3 class="text-xl font-semibold text-[#5f3917] mb-2">Academia</h3>
-        <p class="text-gray-600">Aprende las técnicas profesionales de chocolatería</p>
+        <h3 class="text-xl font-semibold text-[#5f3917] mb-2">{{ \App\Models\Setting::get('home_feature_3_title', 'Academia') }}</h3>
+        <p class="text-gray-600">{{ \App\Models\Setting::get('home_feature_3_description', 'Aprende las técnicas profesionales de chocolatería') }}</p>
       </div>
 
     </div>
@@ -175,9 +178,39 @@
       </p>
     </div>
 
+    @if(isset($productos) && $productos->count() > 0)
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto mb-12">
-
-      <!-- Producto 1 -->
+      @foreach($productos->take(4) as $producto)
+      <div class="group relative">
+        <div class="relative w-full aspect-square mb-4">
+          @if($producto->image)
+            <div class="absolute inset-0 rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+              <img src="{{ asset('storage/' . $producto->image) }}"
+                   alt="{{ $producto->name }}"
+                   class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300">
+            </div>
+          @else
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br {{ $producto->gradient ?? 'from-[#e28dc4] to-[#81cacf]' }} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+              @if($producto->icon)
+                @if(filter_var($producto->icon, FILTER_VALIDATE_URL) || str_starts_with($producto->icon, '/'))
+                  <img src="{{ asset('storage/' . $producto->icon) }}"
+                       alt="{{ $producto->name }}"
+                       class="w-20 h-20 object-contain transform group-hover:scale-110 transition-transform duration-300">
+                @else
+                  <div class="text-6xl transform group-hover:scale-110 transition-transform duration-300">{{ $producto->icon }}</div>
+                @endif
+              @else
+                <div class="text-6xl transform group-hover:scale-110 transition-transform duration-300">🍫</div>
+              @endif
+            </div>
+          @endif
+        </div>
+        <h3 class="text-lg font-semibold text-[#5f3917] text-center">{{ $producto->name }}</h3>
+      </div>
+      @endforeach
+    </div>
+    @else
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto mb-12">
       <div class="group relative">
         <div class="relative w-full aspect-square mb-4">
           <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#e28dc4] to-[#81cacf] flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
@@ -186,8 +219,6 @@
         </div>
         <h3 class="text-lg font-semibold text-[#5f3917] text-center">Bombones</h3>
       </div>
-
-      <!-- Producto 2 -->
       <div class="group relative">
         <div class="relative w-full aspect-square mb-4">
           <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#81cacf] to-[#c6d379] flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
@@ -196,8 +227,6 @@
         </div>
         <h3 class="text-lg font-semibold text-[#5f3917] text-center">Tabletas</h3>
       </div>
-
-      <!-- Producto 3 -->
       <div class="group relative">
         <div class="relative w-full aspect-square mb-4">
           <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#c6d379] to-[#e28dc4] flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
@@ -206,8 +235,6 @@
         </div>
         <h3 class="text-lg font-semibold text-[#5f3917] text-center">Figuras</h3>
       </div>
-
-      <!-- Producto 4 -->
       <div class="group relative">
         <div class="relative w-full aspect-square mb-4">
           <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#5f3917] to-[#e28dc4] flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
@@ -216,8 +243,8 @@
         </div>
         <h3 class="text-lg font-semibold text-[#5f3917] text-center">Trufas</h3>
       </div>
-
     </div>
+    @endif
 
     <div class="text-center">
       <a href="{{ route('productos') }}" class="inline-block px-8 py-4 bg-[#5f3917] text-white rounded-full font-semibold hover:bg-[#e28dc4] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -317,6 +344,23 @@
 </section>
 
 <!-- Galería Preview Section -->
+@php
+  use App\Models\GalleryImage;
+
+  // 1) Toma destacados primero, luego completa hasta 4 con el resto según 'order'
+  $destacadas = GalleryImage::featured()->ordered()->take(4)->get();
+  $faltan = 4 - $destacadas->count();
+
+  $otras = $faltan > 0
+      ? GalleryImage::whereNotIn('id', $destacadas->pluck('id'))
+          ->ordered()
+          ->take($faltan)
+          ->get()
+      : collect();
+
+  $preview = $destacadas->concat($otras);
+@endphp
+
 <section class="py-20 bg-white">
   <div class="container-choco">
     <div class="text-center mb-12">
@@ -328,37 +372,63 @@
       </p>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto mb-12">
+    @if($preview->count())
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto mb-12">
+        @foreach($preview as $item)
+          <a href="{{ route('galeria') }}"
+             class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer block"
+             aria-label="{{ $item->title ?? $item->category ?? 'Imagen de la galería' }}">
+            @if($item->image_url)
+              <img src="{{ $item->image_url }}" alt="{{ $item->title ?? $item->category ?? 'Imagen de galería' }}"
+                   class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+            @endif
 
-      <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
-        <div class="absolute inset-0 bg-gradient-to-br from-[#e28dc4] to-[#81cacf]"></div>
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <h4 class="text-white text-lg font-semibold">Bombones</h4>
+            {{-- Fallback/overlay de gradiente (o si no hay imagen) --}}
+            <div class="absolute inset-0 bg-gradient-to-br {{ $item->gradient_class }} {{ $item->image_url ? 'mix-blend-multiply' : '' }}"></div>
+
+            {{-- Overlay hover --}}
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <div class="text-center px-4">
+                <h4 class="text-white text-lg font-semibold">
+                  {{ $item->title ?: ($item->category ?: 'Ver más') }}
+                </h4>
+                @if($item->category)
+                  <p class="text-white/80 text-sm mt-1">{{ $item->category }}</p>
+                @endif
+              </div>
+            </div>
+          </a>
+        @endforeach
+      </div>
+    @else
+      {{-- Fallback si no hay imágenes en BD: conserva tus 4 tarjetas de ejemplo --}}
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto mb-12">
+        <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
+          <div class="absolute inset-0 bg-gradient-to-br from-[#e28dc4] to-[#81cacf]"></div>
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <h4 class="text-white text-lg font-semibold">Bombones</h4>
+          </div>
+        </div>
+        <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
+          <div class="absolute inset-0 bg-gradient-to-br from-[#81cacf] to-[#c6d379]"></div>
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <h4 class="text-white text-lg font-semibold">Tabletas</h4>
+          </div>
+        </div>
+        <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
+          <div class="absolute inset-0 bg-gradient-to-br from-[#c6d379] to-[#e28dc4]"></div>
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <h4 class="text-white text-lg font-semibold">Figuras</h4>
+          </div>
+        </div>
+        <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
+          <div class="absolute inset-0 bg-gradient-to-br from-[#5f3917] to-[#e28dc4]"></div>
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <h4 class="text-white text-lg font-semibold">Eventos</h4>
+          </div>
         </div>
       </div>
-
-      <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
-        <div class="absolute inset-0 bg-gradient-to-br from-[#81cacf] to-[#c6d379]"></div>
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <h4 class="text-white text-lg font-semibold">Tabletas</h4>
-        </div>
-      </div>
-
-      <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
-        <div class="absolute inset-0 bg-gradient-to-br from-[#c6d379] to-[#e28dc4]"></div>
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <h4 class="text-white text-lg font-semibold">Figuras</h4>
-        </div>
-      </div>
-
-      <div class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer">
-        <div class="absolute inset-0 bg-gradient-to-br from-[#5f3917] to-[#e28dc4]"></div>
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <h4 class="text-white text-lg font-semibold">Eventos</h4>
-        </div>
-      </div>
-
-    </div>
+    @endif
 
     <div class="text-center">
       <a href="{{ route('galeria') }}" class="inline-block px-8 py-4 bg-[#5f3917] text-white rounded-full font-semibold hover:bg-[#e28dc4] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -367,6 +437,7 @@
     </div>
   </div>
 </section>
+
 
 <!-- Contact CTA Section -->
 <section class="relative py-20 bg-white">

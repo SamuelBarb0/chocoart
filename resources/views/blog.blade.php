@@ -46,193 +46,53 @@
       </p>
     </div>
 
+    @if($posts->count() > 0)
     <!-- Blog Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-
-      <!-- Blog Post 1 -->
+      @foreach($posts as $post)
+      <!-- Blog Post: {{ $post->title }} -->
       <article class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-        <div class="h-56 bg-gradient-to-br from-[#e28dc4] to-[#81cacf] relative overflow-hidden">
+        <div class="h-56 bg-gradient-to-br {{ $post->gradient }} relative overflow-hidden">
           <div class="absolute inset-0 flex items-center justify-center text-7xl">
-            🍫
+            {{ $post->icon }}
           </div>
           <div class="absolute top-4 right-4 bg-[#5f3917] text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Técnicas
+            {{ $post->category }}
           </div>
         </div>
         <div class="p-6">
-          <div class="text-sm text-gray-500 mb-2">15 de Septiembre, 2024</div>
+          <div class="text-sm text-gray-500 mb-2">
+            {{ $post->published_at ? $post->published_at->translatedFormat('d \d\e F, Y') : 'Sin fecha' }}
+          </div>
           <h3 class="text-xl font-bold text-[#5f3917] mb-3 group-hover:text-[#e28dc4] transition-colors">
-            El Arte del Templado del Chocolate
+            {{ $post->title }}
           </h3>
           <p class="text-gray-600 mb-4">
-            Descubre los secretos para lograr el templado perfecto y obtener ese brillo característico en tus chocolates artesanales.
+            {{ $post->excerpt }}
           </p>
-          <a href="{{ route('blog.post', 'arte-templado-chocolate') }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors">
-            Leer más
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
+          <div class="flex items-center justify-between">
+            <a href="{{ route('blog.post', $post->slug) }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors">
+              Leer más
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </a>
+            @if($post->read_time)
+            <span class="text-sm text-gray-400">{{ $post->read_time }} min</span>
+            @endif
+          </div>
         </div>
       </article>
-
-      <!-- Blog Post 2 -->
-      <article class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-        <div class="h-56 bg-gradient-to-br from-[#81cacf] to-[#c6d379] relative overflow-hidden">
-          <div class="absolute inset-0 flex items-center justify-center text-7xl">
-            🎨
-          </div>
-          <div class="absolute top-4 right-4 bg-[#5f3917] text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Decoración
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="text-sm text-gray-500 mb-2">10 de Septiembre, 2024</div>
-          <h3 class="text-xl font-bold text-[#5f3917] mb-3 group-hover:text-[#e28dc4] transition-colors">
-            Técnicas de Decoración con Transfer
-          </h3>
-          <p class="text-gray-600 mb-4">
-            Aprende a crear diseños impresionantes usando la técnica de transfer y lleva tus chocolates al siguiente nivel.
-          </p>
-          <a href="{{ route('blog.post', 'tecnicas-decoracion-transfer') }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors">
-            Leer más
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
-        </div>
-      </article>
-
-      <!-- Blog Post 3 -->
-      <article class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-        <div class="h-56 bg-gradient-to-br from-[#c6d379] to-[#e28dc4] relative overflow-hidden">
-          <div class="absolute inset-0 flex items-center justify-center text-7xl">
-            🌱
-          </div>
-          <div class="absolute top-4 right-4 bg-[#5f3917] text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Ingredientes
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="text-sm text-gray-500 mb-2">5 de Septiembre, 2024</div>
-          <h3 class="text-xl font-bold text-[#5f3917] mb-3 group-hover:text-[#e28dc4] transition-colors">
-            Chocolate de Origen: Qué es y Por Qué Importa
-          </h3>
-          <p class="text-gray-600 mb-4">
-            Explora el fascinante mundo del cacao de origen único y cómo impacta el sabor de tus creaciones.
-          </p>
-          <a href="{{ route('blog.post', 'chocolate-origen') }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors">
-            Leer más
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
-        </div>
-      </article>
-
-      <!-- Blog Post 4 -->
-      <article class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-        <div class="h-56 bg-gradient-to-br from-[#5f3917] to-[#c6d379] relative overflow-hidden">
-          <div class="absolute inset-0 flex items-center justify-center text-7xl">
-            💼
-          </div>
-          <div class="absolute top-4 right-4 bg-[#e28dc4] text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Negocio
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="text-sm text-gray-500 mb-2">28 de Agosto, 2024</div>
-          <h3 class="text-xl font-bold text-[#5f3917] mb-3 group-hover:text-[#e28dc4] transition-colors">
-            Cómo Iniciar tu Negocio de Chocolatería
-          </h3>
-          <p class="text-gray-600 mb-4">
-            Consejos prácticos para convertir tu pasión por el chocolate en un emprendimiento exitoso.
-          </p>
-          <a href="{{ route('blog.post', 'iniciar-negocio-chocolateria') }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors">
-            Leer más
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
-        </div>
-      </article>
-
-      <!-- Blog Post 5 -->
-      <article class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-        <div class="h-56 bg-gradient-to-br from-[#e28dc4] to-[#c6d379] relative overflow-hidden">
-          <div class="absolute inset-0 flex items-center justify-center text-7xl">
-            🍬
-          </div>
-          <div class="absolute top-4 right-4 bg-[#5f3917] text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Recetas
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="text-sm text-gray-500 mb-2">20 de Agosto, 2024</div>
-          <h3 class="text-xl font-bold text-[#5f3917] mb-3 group-hover:text-[#e28dc4] transition-colors">
-            5 Rellenos Gourmet para Bombones
-          </h3>
-          <p class="text-gray-600 mb-4">
-            Ideas innovadoras de rellenos que harán que tus bombones sean inolvidables y sorprendan a tus clientes.
-          </p>
-          <a href="{{ route('blog.post', 'rellenos-gourmet-bombones') }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors">
-            Leer más
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
-        </div>
-      </article>
-
-      <!-- Blog Post 6 -->
-      <article class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-        <div class="h-56 bg-gradient-to-br from-[#81cacf] to-[#e28dc4] relative overflow-hidden">
-          <div class="absolute inset-0 flex items-center justify-center text-7xl">
-            📚
-          </div>
-          <div class="absolute top-4 right-4 bg-[#5f3917] text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Historia
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="text-sm text-gray-500 mb-2">12 de Agosto, 2024</div>
-          <h3 class="text-xl font-bold text-[#5f3917] mb-3 group-hover:text-[#e28dc4] transition-colors">
-            La Historia del Chocolate: Del Cacao a tu Mesa
-          </h3>
-          <p class="text-gray-600 mb-4">
-            Un viaje fascinante por la historia del chocolate, desde las civilizaciones antiguas hasta hoy.
-          </p>
-          <a href="{{ route('blog.post', 'historia-chocolate') }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors">
-            Leer más
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
-        </div>
-      </article>
-
+      @endforeach
     </div>
-
-    <!-- Pagination -->
-    <div class="mt-12 flex justify-center">
-      <nav class="flex items-center gap-2">
-        <a href="#" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
-          Anterior
-        </a>
-        <a href="#" class="px-4 py-2 rounded-lg bg-[#e28dc4] text-white font-semibold">
-          1
-        </a>
-        <a href="#" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-[#81cacf] hover:text-white transition-colors">
-          2
-        </a>
-        <a href="#" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-[#81cacf] hover:text-white transition-colors">
-          3
-        </a>
-        <a href="#" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-[#e28dc4] hover:text-white transition-colors">
-          Siguiente
-        </a>
-      </nav>
+    @else
+    <!-- Sin posts -->
+    <div class="text-center py-16">
+      <div class="text-6xl mb-4">📝</div>
+      <h3 class="text-2xl font-semibold text-gray-700 mb-2">Próximamente</h3>
+      <p class="text-gray-500">Estamos preparando contenido increíble sobre el mundo del chocolate</p>
     </div>
+    @endif
   </div>
 </section>
 

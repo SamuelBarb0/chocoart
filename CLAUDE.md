@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Chocoart is a Laravel 12 web application for an artisanal chocolate business. The project showcases chocolate products, offers online courses, and provides contact functionality. The site features a custom brand design with liquid/fluid visual effects following a specific brand manual.
+Chocoart is a Laravel 12 web application for an artisanal chocolate business. The project showcases chocolate products, offers online courses, provides a blog, and includes contact functionality. The site features a custom brand design with liquid/fluid visual effects following a specific brand manual.
+
+**Key Technologies:**
+- Laravel 12 (PHP 8.2+)
+- Filament 3.3 (Admin Panel)
+- Tailwind CSS 4 (with Vite)
+- SQLite (default) or MySQL
 
 ## Brand Identity (Critical)
 
@@ -77,8 +83,14 @@ php artisan migrate
 # Fresh migration with seeding
 php artisan migrate:fresh --seed
 
+# Seed admin user for Filament panel
+php artisan db:seed --class=AdminUserSeeder
+
 # Rollback
 php artisan migrate:rollback
+
+# Create storage link for uploaded files
+php artisan storage:link
 ```
 
 ### Asset Management
@@ -92,6 +104,55 @@ composer install
 ```
 
 ## Architecture
+
+### Database Models
+
+The application uses Eloquent models with the following structure:
+
+**Product** (`app/Models/Product.php`)
+- Fields: name, slug, description, price, category, icon, gradient, image, images (array), featured, published, order, SEO fields
+- Scopes: `published()`, `featured()`
+- Auto-generates slug from name on creation
+- Auto-populates SEO meta fields if empty
+
+**Course** (`app/Models/Course.php`)
+- Similar structure to Product
+- Fields include badge field for highlighting
+
+**Post** (`app/Models/Post.php`)
+- Blog posts with published status
+- Ordered by published_at date
+
+**GalleryImage** (`app/Models/GalleryImage.php`)
+- Simple gallery images with ordering
+
+**SeoSetting** (`app/Models/SeoSetting.php`)
+- Global SEO configuration
+
+### Filament Admin Panel
+
+The admin panel is accessible at `/admin` and uses Filament 3.3:
+
+**Access:**
+- URL: `http://localhost/chocoart/public/admin`
+- Default credentials: admin@chocoart.com / password
+- Brand colors customized to match Chocoart pink theme
+
+**Resources:**
+- ProductResource - Manage products with image uploads, gallery, SEO
+- CourseResource - Manage courses
+- PostResource - Manage blog posts
+- GalleryImageResource - Manage gallery
+- SeoSettingResource - Global SEO settings
+
+**Features:**
+- File uploads stored in `storage/app/public` (symlinked to `public/storage`)
+- Image editor for cropping/resizing
+- Reorderable galleries
+- Rich text editor for descriptions
+- SEO fields (meta_title, meta_description, meta_keywords)
+- Published/Featured toggles
+- Order field for custom sorting
 
 ### Frontend Structure
 
@@ -108,8 +169,8 @@ composer install
   - Footer with wave divider SVG
   - Google Fonts: Poppins, Dancing Script, Quicksand
   - Mobile menu collapse functionality
-- `resources/views/home.blade.php` - One-page design with all sections
-- Additional views: `productos.blade.php`, `cursos.blade.php`, `galeria.blade.php`, `contacto.blade.php`
+  - WhatsApp floating button
+- Page views: `home.blade.php`, `productos.blade.php`, `cursos.blade.php`, `galeria.blade.php`, `blog.blade.php`, `blog-post.blade.php`, `contacto.blade.php`
 
 **JavaScript Assets:**
 - `public/js/animations.js` - Brand-specific animations referenced in layout
@@ -121,16 +182,32 @@ composer install
 - CSS custom properties in `:root` for brand consistency
 - Responsive design with Tailwind breakpoints (sm, md, lg)
 
-### Backend Structure
+### Routes Structure
 
-**Routes (`routes/web.php`):**
-All routes currently use closures (no controllers):
-- `GET /` → `home` view (route name: `home`)
-- `GET /productos` → `productos` view (route name: `productos`)
-- `GET /cursos` → `cursos` view (route name: `cursos`)
-- `GET /galeria` → `galeria` view (route name: `galeria`)
-- `GET /contacto` → `contacto` view (route name: `contacto`)
-- `POST /contacto` → Basic redirect (route name: `contacto.store`) - **TODO: needs implementation**
+Routes are defined in `routes/web.php` using closure-based routing:
+
+**Public Routes:**
+- `GET /` → home view (displays welcome content)
+- `GET /productos` → productos view (fetches published products from DB)
+- `GET /cursos` → cursos view (fetches published courses from DB)
+- `GET /galeria` → galeria view (fetches gallery images from DB)
+- `GET /blog` → blog view (fetches published posts from DB)
+- `GET /blog/{slug}` → blog-post view (currently uses hardcoded array, can be converted to DB)
+- `GET /contacto` → contacto view
+- `POST /contacto` → contacto.store (TODO: needs implementation)
+- `GET /media/{path}` → serves files from public storage
+
+**Admin Routes:**
+- Automatically handled by Filament at `/admin`
+
+**Data Flow:**
+Routes fetch data from models and pass to views via `compact()`:
+```php
+Route::get('/productos', function () {
+    $productos = Product::where('published', true)->orderBy('order')->get();
+    return view('productos', compact('productos'));
+});
+```
 
 **Views Pattern:**
 ```blade
@@ -162,6 +239,7 @@ The contact form currently redirects back with a success message but doesn't pro
 2. Extend `layouts.app` layout
 3. Add route in `routes/web.php`
 4. Use brand colors and existing CSS patterns
+5. If data-driven, create model and Filament resource
 
 ### Styling Guidelines
 
@@ -184,41 +262,75 @@ The contact form currently redirects back with a success message but doesn't pro
 - Form submissions include CSRF token (`@csrf`)
 - Keyboard navigation support (Escape to close, Arrow keys for carousels)
 
+### Adding Content via Filament
+
+1. Access admin panel at `/admin`
+2. Login with admin credentials
+3. Use resource forms to add/edit Products, Courses, Posts, Gallery Images
+4. Upload images (automatically stored in `storage/app/public`)
+5. Set order field to control display sequence (lower = first)
+6. Toggle published/featured as needed
+7. Content automatically appears on frontend routes
+
 ## Environment Setup
 
 Required `.env` configuration:
 ```env
 APP_NAME=Chocoart
 APP_ENV=local
-APP_KEY=base64:...
+APP_KEY=base64:... # Generate with php artisan key:generate
 APP_DEBUG=true
 APP_URL=http://localhost
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=chocoart
-DB_USERNAME=root
-DB_PASSWORD=
+# SQLite (default) or MySQL
+DB_CONNECTION=sqlite
+# For MySQL, uncomment and configure:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=chocoart
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# File uploads
+FILESYSTEM_DISK=public
+
+# Mail configuration (for contact form)
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="noreply@chocoart.com"
+MAIL_FROM_NAME="Chocoart"
 ```
 
 ## XAMPP/Local Development
 
 This project runs in XAMPP environment:
 - Web root: `c:\xampp1\htdocs\chocoart`
-- Access via: `http://localhost/chocoart/public`
-- Ensure Apache and MySQL are running
+- Access frontend: `http://localhost/chocoart/public`
+- Access admin: `http://localhost/chocoart/public/admin`
+- Ensure Apache and MySQL are running (if using MySQL instead of SQLite)
+- Ensure `public/storage` symlink exists: `php artisan storage:link`
 
 ## Important Implementation Notes
+
+### File Uploads
+
+- Images uploaded via Filament are stored in `storage/app/public/`
+- Symlink required: `php artisan storage:link` creates `public/storage -> storage/app/public`
+- Access images in views: `{{ asset('storage/products/image.jpg') }}`
+- Or use media route: `{{ url('/media/products/image.jpg') }}`
 
 ### Interactive Components
 
 **Product Modal with Carousel:**
-- Located in `home.blade.php` products section
+- Located in relevant product views
 - Triggered by `.open-modal` buttons with `data-*` attributes
 - Carousel supports touch/swipe on mobile
 - Images array passed via `data-images` JSON attribute
-- Modal styling uses gradient card (`card-choco-rose` class)
+- Modal styling uses gradient card with brand colors
 
 **SVG Patterns:**
 - Wave dividers: Use `<path>` with curves for organic section transitions
@@ -229,9 +341,26 @@ This project runs in XAMPP environment:
 
 Use Laravel asset helpers for all resources:
 - Images: `{{ asset('images/filename.png') }}`
+- Storage images: `{{ asset('storage/products/filename.jpg') }}`
 - Videos: `{{ asset('videos/filename.mp4') }}`
 - JavaScript: `{{ asset('js/filename.js') }}`
 - Routes: `{{ route('route.name') }}`
+
+### Data Patterns
+
+When working with models, follow these patterns:
+
+**Fetching published content:**
+```php
+$productos = Product::published()->orderBy('order')->get();
+$cursos = Course::published()->orderBy('order')->get();
+$posts = Post::published()->orderBy('published_at', 'desc')->get();
+```
+
+**Featured items:**
+```php
+$featured = Product::published()->featured()->get();
+```
 
 ## Brand Consistency Checklist
 
@@ -243,3 +372,5 @@ When adding features, verify:
 - [ ] Responsive across breakpoints (mobile-first approach)
 - [ ] Smooth animations using Tailwind transitions or custom `@keyframes`
 - [ ] Accessibility: proper ARIA labels, keyboard navigation, semantic HTML
+- [ ] Images uploaded via Filament are properly referenced in views
+- [ ] Data fetched from models, not hardcoded (except where noted)

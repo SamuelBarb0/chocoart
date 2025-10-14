@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $title . ' - Blog Chocoart')
+@section('title', $post->title . ' - Blog Chocoart')
 
 @section('content')
 
@@ -21,13 +21,13 @@
       <!-- Category Badge -->
       <div class="mb-4">
         <span class="inline-block bg-[#e28dc4] text-white px-4 py-2 rounded-full text-sm font-semibold">
-          {{ $category }}
+          {{ $post->category }}
         </span>
       </div>
 
       <!-- Title -->
       <h1 class="font-['Dancing_Script'] text-4xl md:text-5xl lg:text-6xl text-white mb-4 leading-tight">
-        {{ $title }}
+        {{ $post->title }}
       </h1>
 
       <!-- Meta -->
@@ -36,14 +36,16 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
-          {{ $date }}
+          {{ $post->published_at ? $post->published_at->translatedFormat('d \d\e F, Y') : 'Sin fecha' }}
         </div>
+        @if($post->read_time)
         <div class="flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          {{ $readTime }} min de lectura
+          {{ $post->read_time }} min de lectura
         </div>
+        @endif
       </div>
     </div>
   </div>
@@ -70,16 +72,16 @@
 
       <!-- Featured Image -->
       <div class="mb-12 rounded-2xl overflow-hidden shadow-2xl">
-        <div class="h-96 bg-gradient-to-br {{ $gradient }} relative">
+        <div class="h-96 bg-gradient-to-br {{ $post->gradient }} relative">
           <div class="absolute inset-0 flex items-center justify-center text-9xl">
-            {{ $icon }}
+            {{ $post->icon }}
           </div>
         </div>
       </div>
 
       <!-- Content -->
-      <div class="prose prose-lg max-w-none">
-        {!! $content !!}
+      <div class="prose prose-lg max-w-none prose-headings:text-[#5f3917] prose-a:text-[#e28dc4] hover:prose-a:text-[#81cacf]">
+        {!! $post->content !!}
       </div>
 
       <!-- Share Section -->
@@ -114,22 +116,23 @@
       </p>
     </div>
 
+    @if($relatedPosts->count() > 0)
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-      @foreach($relatedPosts as $post)
+      @foreach($relatedPosts as $relatedPost)
       <article class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-        <div class="h-48 bg-gradient-to-br {{ $post['gradient'] }} relative overflow-hidden">
+        <div class="h-48 bg-gradient-to-br {{ $relatedPost->gradient }} relative overflow-hidden">
           <div class="absolute inset-0 flex items-center justify-center text-6xl">
-            {{ $post['icon'] }}
+            {{ $relatedPost->icon }}
           </div>
         </div>
         <div class="p-6">
           <h3 class="text-lg font-bold text-[#5f3917] mb-2 group-hover:text-[#e28dc4] transition-colors">
-            {{ $post['title'] }}
+            {{ $relatedPost->title }}
           </h3>
           <p class="text-gray-600 text-sm mb-4">
-            {{ $post['excerpt'] }}
+            {{ $relatedPost->excerpt }}
           </p>
-          <a href="{{ route('blog.post', $post['slug']) }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors text-sm">
+          <a href="{{ route('blog.post', $relatedPost->slug) }}" class="inline-flex items-center gap-2 text-[#81cacf] font-semibold hover:text-[#5f3917] transition-colors text-sm">
             Leer más
             <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
@@ -139,6 +142,11 @@
       </article>
       @endforeach
     </div>
+    @else
+    <div class="text-center py-8">
+      <p class="text-gray-500">No hay artículos relacionados disponibles</p>
+    </div>
+    @endif
 
     <div class="text-center mt-12">
       <a href="{{ route('blog') }}" class="inline-block px-8 py-4 bg-[#5f3917] text-white rounded-full font-semibold hover:bg-[#e28dc4] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">

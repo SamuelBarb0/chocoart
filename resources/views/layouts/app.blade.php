@@ -102,19 +102,25 @@
       <div class="container-choco">
         <div class="flex items-center justify-between py-2 gap-4">
           <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1">✉️ <span>info@chocoart.com.co</span></span>
-            <span class="hidden sm:inline-flex items-center gap-1">📞 <span>+57 300 123 4567</span></span>
+            <span class="flex items-center gap-1">✉️ <span>{{ \App\Models\Setting::get('contact_email', 'info@chocoart.com.co') }}</span></span>
+            <span class="hidden sm:inline-flex items-center gap-1">📞 <span>{{ \App\Models\Setting::get('contact_phone', '+57 300 123 4567') }}</span></span>
           </div>
           <div class="flex items-center gap-3">
-            <a href="#" aria-label="Facebook" class="btn-link">
+            @if(\App\Models\Setting::get('social_facebook'))
+            <a href="{{ \App\Models\Setting::get('social_facebook') }}" aria-label="Facebook" class="btn-link" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
-            <a href="#" aria-label="Instagram" class="btn-link">
+            @endif
+            @if(\App\Models\Setting::get('social_instagram'))
+            <a href="{{ \App\Models\Setting::get('social_instagram') }}" aria-label="Instagram" class="btn-link" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
             </a>
-            <a href="#" aria-label="WhatsApp" class="btn-link">
+            @endif
+            @if(\App\Models\Setting::get('contact_whatsapp'))
+            <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '573001234567') }}" aria-label="WhatsApp" class="btn-link" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
             </a>
+            @endif
           </div>
         </div>
       </div>
@@ -187,18 +193,28 @@
       <div class="container-choco pt-20">
         <div class="grid gap-10 lg:grid-cols-4 py-12">
           <div class="col-span-1">
-            <img src="{{ asset('images/LC_6Logo ChocoArt.png') }}" alt="Chocoart" class="h-20 w-auto mb-4">
-            <p class="text-[#5f3917] font-['Dancing_Script'] text-xl mb-4">Arte dulce con amor</p>
+            @php
+              $footerLogo = \App\Models\Setting::get('footer_logo', 'images/PRINCIPAL.png');
+              $logoPath = str_starts_with($footerLogo, 'settings/') ? asset('storage/' . $footerLogo) : asset($footerLogo);
+            @endphp
+            <img src="{{ $logoPath }}" alt="Chocoart" class="h-20 w-auto mb-4">
+            <p class="text-[#5f3917] font-['Dancing_Script'] text-xl mb-4">{{ \App\Models\Setting::get('footer_about', 'Arte dulce con amor') }}</p>
             <div class="flex items-center gap-3">
-              <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#e28dc4] hover:bg-[#e28dc4] hover:text-white transition-all duration-300">
+              @if(\App\Models\Setting::get('social_facebook'))
+              <a href="{{ \App\Models\Setting::get('social_facebook') }}" aria-label="Facebook" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#e28dc4] hover:bg-[#e28dc4] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
               </a>
-              <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#81cacf] hover:bg-[#81cacf] hover:text-white transition-all duration-300">
+              @endif
+              @if(\App\Models\Setting::get('social_instagram'))
+              <a href="{{ \App\Models\Setting::get('social_instagram') }}" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#81cacf] hover:bg-[#81cacf] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
               </a>
-              <a href="#" aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#c6d379] hover:bg-[#c6d379] hover:text-white transition-all duration-300">
+              @endif
+              @if(\App\Models\Setting::get('contact_whatsapp'))
+              <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '573001234567') }}" aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#c6d379] hover:bg-[#c6d379] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               </a>
+              @endif
             </div>
           </div>
 
@@ -242,14 +258,14 @@
         </div>
 
         <div class="py-6 border-t border-pink-200 text-center text-sm text-gray-600">
-          <p class="mb-2">© {{ date('Y') }} <span class="font-semibold text-[#e28dc4]">Chocoart</span> - Todos los derechos reservados</p>
+          <p class="mb-2">{{ \App\Models\Setting::get('footer_copyright', '© ' . date('Y') . ' Chocoart - Todos los derechos reservados') }}</p>
           <p class="text-xs">Hecho con <span class="text-red-500">❤️</span> y mucho <span class="text-[#5f3917]">🍫</span></p>
         </div>
       </div>
     </footer>
 
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/573001234567" target="_blank" class="whatsapp-float" aria-label="Contactar por WhatsApp">
+    <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '573001234567') }}?text={{ urlencode(\App\Models\Setting::get('contact_whatsapp_message', 'Hola, me gustaría obtener más información')) }}" target="_blank" class="whatsapp-float" aria-label="Contactar por WhatsApp">
       <svg fill="currentColor" viewBox="0 0 24 24">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
       </svg>
