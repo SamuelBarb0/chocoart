@@ -14,15 +14,11 @@ class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-8-tooth';
-
-    protected static ?string $navigationLabel = 'Configuración';
-
-    protected static ?string $modelLabel = 'Configuración';
-
+    protected static ?string $navigationIcon   = 'heroicon-o-cog-8-tooth';
+    protected static ?string $navigationLabel  = 'Configuración';
+    protected static ?string $modelLabel       = 'Configuración';
     protected static ?string $pluralModelLabel = 'Configuración';
-
-    protected static ?int $navigationSort = 6;
+    protected static ?int    $navigationSort   = 6;
 
     public static function form(Form $form): Form
     {
@@ -48,10 +44,10 @@ class SettingResource extends Resource
                             ->label('Grupo')
                             ->required()
                             ->options([
-                                'home' => 'Inicio',
+                                'home'    => 'Inicio',
                                 'contact' => 'Contacto',
-                                'social' => 'Redes Sociales',
-                                'footer' => 'Footer',
+                                'social'  => 'Redes Sociales',
+                                'footer'  => 'Footer',
                                 'general' => 'General',
                             ])
                             ->default('general'),
@@ -60,12 +56,12 @@ class SettingResource extends Resource
                             ->label('Tipo')
                             ->required()
                             ->options([
-                                'text' => 'Texto',
+                                'text'     => 'Texto',
                                 'textarea' => 'Texto Largo',
-                                'email' => 'Email',
-                                'phone' => 'Teléfono',
-                                'url' => 'URL',
-                                'image' => 'Imagen',
+                                'email'    => 'Email',
+                                'phone'    => 'Teléfono',
+                                'url'      => 'URL',
+                                'image'    => 'Imagen',
                             ])
                             ->default('text')
                             ->reactive(),
@@ -103,12 +99,13 @@ class SettingResource extends Resource
                         Forms\Components\FileUpload::make('value')
                             ->label('Imagen o Video')
                             ->acceptedFileTypes(['image/*', 'video/*'])
-                            ->disk('public')
-                            ->directory('settings')
+                            ->disk('public_uploads')     // ← PRODUCCIÓN
+                            ->directory('settings')      // /media/settings/...
                             ->visibility('public')
+                            ->preserveFilenames()
                             ->maxSize(51200)
                             ->visible(fn ($get) => $get('type') === 'image')
-                            ->helperText('Sube una imagen o video (máx 50MB)')
+                            ->helperText('Sube imagen o video (máx 50MB). Se guarda en /media/settings')
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -134,33 +131,33 @@ class SettingResource extends Resource
                     ->label('Grupo')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'home' => 'primary',
+                        'home'    => 'primary',
                         'contact' => 'success',
-                        'social' => 'warning',
-                        'footer' => 'info',
+                        'social'  => 'warning',
+                        'footer'  => 'info',
                         'general' => 'secondary',
-                        default => 'secondary',
+                        default   => 'secondary',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'home' => 'Inicio',
+                        'home'    => 'Inicio',
                         'contact' => 'Contacto',
-                        'social' => 'Redes Sociales',
-                        'footer' => 'Footer',
+                        'social'  => 'Redes Sociales',
+                        'footer'  => 'Footer',
                         'general' => 'General',
-                        default => $state,
+                        default   => $state,
                     })
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('type')
                     ->label('Tipo')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'text' => 'Texto',
+                        'text'     => 'Texto',
                         'textarea' => 'Texto Largo',
-                        'email' => 'Email',
-                        'phone' => 'Teléfono',
-                        'url' => 'URL',
-                        'image' => 'Imagen',
-                        default => $state,
+                        'email'    => 'Email',
+                        'phone'    => 'Teléfono',
+                        'url'      => 'URL',
+                        'image'    => 'Imagen',
+                        default    => $state,
                     })
                     ->toggleable(),
 
@@ -180,22 +177,21 @@ class SettingResource extends Resource
                 Tables\Filters\SelectFilter::make('group')
                     ->label('Grupo')
                     ->options([
-                        'home' => 'Inicio',
+                        'home'    => 'Inicio',
                         'contact' => 'Contacto',
-                        'social' => 'Redes Sociales',
-                        'footer' => 'Footer',
+                        'social'  => 'Redes Sociales',
+                        'footer'  => 'Footer',
                         'general' => 'General',
                     ]),
-
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Tipo')
                     ->options([
-                        'text' => 'Texto',
+                        'text'     => 'Texto',
                         'textarea' => 'Texto Largo',
-                        'email' => 'Email',
-                        'phone' => 'Teléfono',
-                        'url' => 'URL',
-                        'image' => 'Imagen',
+                        'email'    => 'Email',
+                        'phone'    => 'Teléfono',
+                        'url'      => 'URL',
+                        'image'    => 'Imagen',
                     ]),
             ])
             ->actions([
@@ -210,17 +206,15 @@ class SettingResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSettings::route('/'),
+            'index'  => Pages\ListSettings::route('/'),
             'create' => Pages\CreateSetting::route('/create'),
-            'edit' => Pages\EditSetting::route('/{record}/edit'),
+            'edit'   => Pages\EditSetting::route('/{record}/edit'),
         ];
     }
 }

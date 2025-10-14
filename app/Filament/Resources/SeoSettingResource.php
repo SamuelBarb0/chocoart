@@ -14,13 +14,12 @@ class SeoSettingResource extends Resource
 {
     protected static ?string $model = SeoSetting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static ?string $navigationLabel = 'SEO';
-    protected static ?string $modelLabel = 'Configuración SEO';
+    protected static ?string $navigationIcon   = 'heroicon-o-cog-6-tooth';
+    protected static ?string $navigationLabel  = 'SEO';
+    protected static ?string $modelLabel       = 'Configuración SEO';
     protected static ?string $pluralModelLabel = 'Configuración SEO';
-    protected static ?int    $navigationSort = 5;
+    protected static ?int    $navigationSort   = 5;
 
-    /** Páginas permitidas para SEO (coinciden con tus rutas) */
     public static function allowedPages(): array
     {
         return [
@@ -45,7 +44,7 @@ class SeoSettingResource extends Resource
                             ->required()
                             ->searchable()
                             ->helperText('Selecciona una de las páginas del sitio.')
-                            ->unique(ignoreRecord: true), // un SEO por página
+                            ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('meta_title')
                             ->label('Meta Título')
                             ->required()
@@ -78,11 +77,11 @@ class SeoSettingResource extends Resource
                         Forms\Components\FileUpload::make('og_image')
                             ->label('OG Imagen')
                             ->image()
-                            ->disk('public')                 // guarda en storage/app/public
-                            ->directory('seo/og')            // p. ej. seo/og/imagen.jpg
-                            ->visibility('public')           // URL pública /storage/seo/og/...
+                            ->disk('public_uploads')     // ← PRODUCCIÓN
+                            ->directory('seo/og')        // /media/seo/og/...
+                            ->visibility('public')
                             ->preserveFilenames()
-                            ->helperText('Recomendado 1200×630px. Se guardará como ruta relativa.'),
+                            ->helperText('Recomendado 1200×630px. Se guarda como ruta relativa en /media.'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Avanzado')
@@ -116,7 +115,7 @@ class SeoSettingResource extends Resource
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('og_image')
                     ->label('OG Imagen')
-                    ->disk('public')
+                    ->disk('public_uploads')  // ← PRODUCCIÓN
                     ->height(40)
                     ->circular(),
                 Tables\Columns\TextColumn::make('og_type')

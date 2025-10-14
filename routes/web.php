@@ -90,7 +90,7 @@ Route::post('/contacto', function () {
 })->name('contacto.store');
 
 Route::get('/media/{path}', function (string $path) {
-    $path = str_replace('..', '', $path); // sanitiza
-    abort_unless(Storage::disk('public')->exists($path), 404);
-    return Storage::disk('public')->response($path);
+    $path = str_replace('..', '', $path);
+    abort_unless(Storage::disk('public_uploads')->exists($path), 404);
+    return Storage::disk('public_uploads')->response($path);
 })->where('path', '.*');

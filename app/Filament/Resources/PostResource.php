@@ -121,7 +121,7 @@ class PostResource extends Resource
                         Forms\Components\FileUpload::make('og_image')
                             ->label('Imagen Open Graph')
                             ->image()
-                            ->disk('public')
+                            ->disk('public_uploads')        // ← AQUÍ
                             ->directory('blog/og-images')
                             ->visibility('public')
                             ->helperText('Imagen para compartir en redes sociales (1200x630px recomendado)')

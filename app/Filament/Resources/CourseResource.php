@@ -60,17 +60,13 @@ class CourseResource extends Resource
                     ->schema([
                         Forms\Components\FileUpload::make('icon')
                             ->label('Icono/Imagen')
-                            ->image()                       // solo indicamos que es imagen
-                            ->disk('public')                // guarda en el disk público
-                            ->directory('courses/icons')    // carpeta dentro de storage/app/public
-                            ->visibility('public')          // URL pública (/storage/...)
-                            ->preserveFilenames()           // opcional: conserva el nombre original
+                            ->image()
+                            ->disk('public_uploads')        // ← AQUÍ
+                            ->directory('courses/icons')    // se guardará en public_html/media/courses/icons
+                            ->visibility('public')
+                            ->preserveFilenames()
                             ->maxSize(4096)
-                            ->acceptedFileTypes(['image/jpeg','image/png','image/webp','image/jpg'])
-                            // 🔴 Importante: SIN crop/resize para no redimensionar
-                            // ->imageCropAspectRatio('1:1')         // ← elimínalo
-                            // ->imageResizeTargetWidth(500)         // ← elimínalo
-                            // ->imageResizeTargetHeight(500)        // ← elimínalo
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
                             ->helperText('Sube JPG/PNG/WebP. No se recorta ni redimensiona automáticamente.'),
                         Forms\Components\TextInput::make('color')
                             ->label('Gradiente')

@@ -38,6 +38,15 @@ return [
             'report' => false,
         ],
 
+        'public_uploads' => [
+        'driver'     => 'local',
+        'root'       => env('PUBLIC_HTML_UPLOADS', '/home/yjopjnuw/public_html/media'),
+        'url'        => rtrim(env('APP_URL', 'https://tu-dominio.com'), '/') . '/media',
+        'visibility' => 'public',
+        'throw'      => false,
+        'report'     => false,
+    ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

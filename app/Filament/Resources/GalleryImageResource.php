@@ -31,7 +31,7 @@ class GalleryImageResource extends Resource
                     ->label('Imagen')
                     ->image()
                     ->required()
-                    ->disk('public')
+                    ->disk('public_uploads')   // ← AQUÍ
                     ->directory('gallery')
                     ->visibility('public')
                     ->maxSize(4096)

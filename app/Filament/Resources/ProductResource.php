@@ -74,18 +74,19 @@ class ProductResource extends Resource
                         Forms\Components\FileUpload::make('image')
                             ->label('Imagen Principal')
                             ->image()
-                            ->disk('public')                 // ← disk público
-                            ->directory('products')          // ← storage/app/public/products
-                            ->visibility('public')           // ← URL pública (/storage/...)
+                            ->disk('public_uploads')     // ← AQUÍ
+                            ->directory('products')
+                            ->visibility('public')
                             ->imageEditor()
                             ->maxSize(4096)
                             ->helperText('Imagen principal del producto'),
+
                         Forms\Components\FileUpload::make('images')
                             ->label('Galería de Imágenes')
                             ->image()
                             ->multiple()
                             ->reorderable()
-                            ->disk('public')
+                            ->disk('public_uploads')     // ← AQUÍ
                             ->directory('products/gallery')
                             ->visibility('public')
                             ->imageEditor()
@@ -99,7 +100,7 @@ class ProductResource extends Resource
                         Forms\Components\FileUpload::make('icon')
                             ->label('Icono/Imagen')
                             ->image()
-                            ->disk('public')
+                            ->disk('public_uploads')     // ← AQUÍ
                             ->directory('products/icons')
                             ->visibility('public')
                             ->imageEditor()
@@ -157,7 +158,7 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('Imagen')
-                    ->disk('public')     // ← importante
+                    ->disk('public_uploads')   // ← AQUÍ
                     ->circular(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')
