@@ -1,11 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    @php
+        use Illuminate\Support\Facades\Route;
+        use Illuminate\Support\Facades\Storage;
+
+        // Detecta la ruta actual y mapea a las páginas SEO permitidas
+        $routeName = Route::currentRouteName();
+        $allowed = [
+            'home'      => 'home',
+            'productos' => 'productos',
+            'cursos'    => 'cursos',
+            'galeria'   => 'galeria',
+            'blog'      => 'blog',
+            'contacto'  => 'contacto',
+        ];
+        $pageKey = $allowed[$routeName] ?? 'home';
+
+        // SEO desde BD
+        $seo = \App\Models\SeoSetting::forPage($pageKey);
+
+        // Título preferente: yield('title') > meta_title (SEO) > fallback
+        $yieldTitle = trim($__env->yieldContent('title') ?? '');
+        $metaTitle  = $yieldTitle !== '' ? $yieldTitle : ($seo->meta_title ?? 'Chocoart - Arte con chocolate');
+
+        // Descripción / keywords
+        $metaDesc = $seo->meta_description
+            ?? 'Chocoart - Arte con chocolate. Productos artesanales y cursos de chocolatería profesional.';
+        $metaKeywords = $seo->meta_keywords
+            ?? 'chocolate, chocolatería, cursos, bombones, artesanal, Bogotá, Colombia';
+
+        // Open Graph / Social
+        $ogTitle = $seo->og_title ?: $metaTitle;
+        $ogDesc  = $seo->og_description ?: $metaDesc;
+        $ogType  = $seo->og_type ?: 'website';
+
+        // Imagen OG: usa accessor si existe, o resuelve ruta relativa del disk public, o fallback
+        $ogImage = null;
+        if ($seo && !empty($seo->og_image)) {
+            if (method_exists($seo, 'getOgImageUrlAttribute') && $seo->og_image_url) {
+                $ogImage = $seo->og_image_url;
+            } else {
+                $ogImage = str_starts_with($seo->og_image, ['http://','https://'])
+                    ? $seo->og_image
+                    : Storage::disk('public')->url($seo->og_image);
+            }
+        }
+        $ogImage = $ogImage ?: asset('images/og-default.jpg');
+
+        $currentUrl = url()->current();
+    @endphp
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Chocoart - Arte con chocolate. Productos artesanales y cursos de chocolatería profesional.">
-    <meta name="keywords" content="chocolate, chocolatería, cursos, bombones, artesanal, Bogotá, Colombia">
-    <title>@yield('title', 'Chocoart - Arte con chocolate')</title>
+
+    {{-- Meta SEO básicas --}}
+    <title>{{ $metaTitle }}</title>
+    <meta name="description" content="{{ $metaDesc }}">
+    <meta name="keywords" content="{{ $metaKeywords }}">
+    <link rel="canonical" href="{{ $currentUrl }}"/>
+
+    {{-- Open Graph / Facebook --}}
+    <meta property="og:title" content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ $ogDesc }}">
+    <meta property="og:type" content="{{ $ogType }}">
+    <meta property="og:url" content="{{ $currentUrl }}">
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:site_name" content="Chocoart">
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $ogTitle }}">
+    <meta name="twitter:description" content="{{ $ogDesc }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
+
+    {{-- JSON-LD / Schema (si existe en BD) --}}
+    @if(!empty($seo?->schema_markup))
+      <script type="application/ld+json">{!! $seo->schema_markup !!}</script>
+    @endif
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,80 +92,33 @@
       body { font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Quicksand', sans-serif; }
 
       /* Animaciones personalizadas */
-      @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-      .animate-spin-slow {
-        animation: spin-slow 20s linear infinite;
-      }
+      @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      .animate-spin-slow { animation: spin-slow 20s linear infinite; }
 
-      @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-      }
-      .animate-float {
-        animation: float 3s ease-in-out infinite;
-      }
+      @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+      .animate-float { animation: float 3s ease-in-out infinite; }
 
       /* Contenedor personalizado */
-      .container-choco {
-        max-width: 1280px;
-        margin-left: auto;
-        margin-right: auto;
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-      }
+      .container-choco { max-width: 1280px; margin-left: auto; margin-right: auto; padding-left: 1.5rem; padding-right: 1.5rem; }
 
       /* Navigation links with aqua underline hover */
-      .nav-link {
-        position: relative;
-        transition: color 0.3s ease;
-      }
-      .nav-link::after {
-        content: '';
-        position: absolute;
-        bottom: -4px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background-color: #81cacf;
-        transition: width 0.3s ease;
-      }
-      .nav-link:hover::after {
-        width: 100%;
-      }
-      .nav-link:hover {
-        color: #81cacf;
-      }
+      .nav-link { position: relative; transition: color 0.3s ease; }
+      .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background-color: #81cacf; transition: width 0.3s ease; }
+      .nav-link:hover::after { width: 100%; }
+      .nav-link:hover { color: #81cacf; }
+
+      /* Estado activo: colorea y fuerza subrayado completo */
+      .nav-link.active { color: #81cacf; }
+      .nav-link.active::after { width: 100%; }
 
       /* WhatsApp Floating Button */
       .whatsapp-float {
-        position: fixed;
-        bottom: 25px;
-        right: 25px;
-        background-color: #25D366;
-        color: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-        transition: all 0.3s ease;
-        z-index: 1000;
-        text-decoration: none;
+        position: fixed; bottom: 25px; right: 25px; background-color: #25D366; color: white;
+        width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); transition: all 0.3s ease; z-index: 1000; text-decoration: none;
       }
-      .whatsapp-float:hover {
-        background-color: #128C7E;
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
-      }
-      .whatsapp-float svg {
-        width: 32px;
-        height: 32px;
-      }
+      .whatsapp-float:hover { background-color: #128C7E; transform: scale(1.1); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6); }
+      .whatsapp-float svg { width: 32px; height: 32px; }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -132,10 +157,9 @@
         <div class="flex items-center justify-between py-3">
           <div class="shrink-0">
             <a href="{{ url('/') }}" class="inline-flex items-center">
-              <img src="{{ asset('images/PRINCIPAL.png') }}" 
-     alt="Chocoart" 
-     class="h-14 md:h-14 w-auto scale-200 transform origin-center">
-
+              <img src="{{ asset('images/PRINCIPAL.png') }}"
+                   alt="Chocoart"
+                   class="h-14 md:h-14 w-auto scale-200 transform origin-center">
             </a>
           </div>
 
@@ -146,24 +170,60 @@
           </button>
 
           <ul id="mainMenu" class="hidden lg:flex items-center gap-6 font-medium">
-            <li><a class="nav-link" href="{{ route('home') }}">Inicio</a></li>
-            <li><a class="nav-link" href="{{ route('productos') }}">Productos</a></li>
-            <li><a class="nav-link" href="{{ route('cursos') }}">Cursos</a></li>
-            <li><a class="nav-link" href="{{ route('galeria') }}">Galería</a></li>
-            <li><a class="nav-link" href="{{ route('blog') }}">Blog</a></li>
-            <li><a class="nav-link" href="{{ route('contacto') }}">Contacto</a></li>
+            <li>
+              <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
+                 href="{{ route('home') }}"
+                 aria-current="{{ request()->routeIs('home') ? 'page' : 'false' }}">
+                 Inicio
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {{ request()->routeIs('productos') ? 'active' : '' }}"
+                 href="{{ route('productos') }}"
+                 aria-current="{{ request()->routeIs('productos') ? 'page' : 'false' }}">
+                 Productos
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {{ request()->routeIs('cursos') ? 'active' : '' }}"
+                 href="{{ route('cursos') }}"
+                 aria-current="{{ request()->routeIs('cursos') ? 'page' : 'false' }}">
+                 Cursos
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {{ request()->routeIs('galeria') ? 'active' : '' }}"
+                 href="{{ route('galeria') }}"
+                 aria-current="{{ request()->routeIs('galeria') ? 'page' : 'false' }}">
+                 Galería
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {{ request()->routeIs('blog') ? 'active' : '' }}"
+                 href="{{ route('blog') }}"
+                 aria-current="{{ request()->routeIs('blog') ? 'page' : 'false' }}">
+                 Blog
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {{ request()->routeIs('contacto') ? 'active' : '' }}"
+                 href="{{ route('contacto') }}"
+                 aria-current="{{ request()->routeIs('contacto') ? 'page' : 'false' }}">
+                 Contacto
+              </a>
+            </li>
           </ul>
         </div>
 
         <!-- Menú móvil -->
         <div id="mobileMenu" class="hidden lg:hidden pb-4">
           <ul class="flex flex-col gap-2 text-base">
-            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600" href="{{ route('home') }}">Inicio</a></li>
-            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600" href="{{ route('productos') }}">Productos</a></li>
-            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600" href="{{ route('cursos') }}">Cursos</a></li>
-            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600" href="{{ route('galeria') }}">Galería</a></li>
-            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600" href="{{ route('blog') }}">Blog</a></li>
-            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600" href="{{ route('contacto') }}">Contacto</a></li>
+            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600 {{ request()->routeIs('home') ? 'bg-pink-50 text-pink-600' : '' }}" href="{{ route('home') }}" aria-current="{{ request()->routeIs('home') ? 'page' : 'false' }}">Inicio</a></li>
+            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600 {{ request()->routeIs('productos') ? 'bg-pink-50 text-pink-600' : '' }}" href="{{ route('productos') }}" aria-current="{{ request()->routeIs('productos') ? 'page' : 'false' }}">Productos</a></li>
+            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600 {{ request()->routeIs('cursos') ? 'bg-pink-50 text-pink-600' : '' }}" href="{{ route('cursos') }}" aria-current="{{ request()->routeIs('cursos') ? 'page' : 'false' }}">Cursos</a></li>
+            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600 {{ request()->routeIs('galeria') ? 'bg-pink-50 text-pink-600' : '' }}" href="{{ route('galeria') }}" aria-current="{{ request()->routeIs('galeria') ? 'page' : 'false' }}">Galería</a></li>
+            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600 {{ request()->routeIs('blog') ? 'bg-pink-50 text-pink-600' : '' }}" href="{{ route('blog') }}" aria-current="{{ request()->routeIs('blog') ? 'page' : 'false' }}">Blog</a></li>
+            <li><a class="block px-3 py-2 rounded-md hover:bg-pink-50 hover:text-pink-600 {{ request()->routeIs('contacto') ? 'bg-pink-50 text-pink-600' : '' }}" href="{{ route('contacto') }}" aria-current="{{ request()->routeIs('contacto') ? 'page' : 'false' }}">Contacto</a></li>
           </ul>
         </div>
       </div>
@@ -201,17 +261,17 @@
             <p class="text-[#5f3917] font-['Dancing_Script'] text-xl mb-4">{{ \App\Models\Setting::get('footer_about', 'Arte dulce con amor') }}</p>
             <div class="flex items-center gap-3">
               @if(\App\Models\Setting::get('social_facebook'))
-              <a href="{{ \App\Models\Setting::get('social_facebook') }}" aria-label="Facebook" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#e28dc4] hover:bg-[#e28dc4] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
+              <a href="{{ \App\Models\Setting::get('social_facebook') }}" aria-label="Facebook" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#e28dc4] hover:bg-[#e28dc4] hover:text-white transition-all duración-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
               </a>
               @endif
               @if(\App\Models\Setting::get('social_instagram'))
-              <a href="{{ \App\Models\Setting::get('social_instagram') }}" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#81cacf] hover:bg-[#81cacf] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
+              <a href="{{ \App\Models\Setting::get('social_instagram') }}" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#81cacf] hover:bg-[#81cacf] hover:text-white transition-all duración-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
               </a>
               @endif
               @if(\App\Models\Setting::get('contact_whatsapp'))
-              <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '573001234567') }}" aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#c6d379] hover:bg-[#c6d379] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
+              <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '573001234567') }}" aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#c6d379] hover:bg-[#c6d379] hover:text-white transition-all duración-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               </a>
               @endif
@@ -222,18 +282,10 @@
             <div>
               <h4 class="text-[#5f3917] font-bold mb-4 text-lg">Productos</h4>
               <ul class="space-y-3 text-gray-600">
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}">
-                  <span class="text-sm">🧁</span> Cupcakes
-                </a></li>
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}">
-                  <span class="text-sm">🎂</span> Pasteles
-                </a></li>
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}">
-                  <span class="text-sm">🍪</span> Macarons
-                </a></li>
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}">
-                  <span class="text-sm">🍰</span> Postres
-                </a></li>
+                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🧁</span> Cupcakes</a></li>
+                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🎂</span> Pasteles</a></li>
+                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🍪</span> Macarons</a></li>
+                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🍰</span> Postres</a></li>
               </ul>
             </div>
             <div>
@@ -278,7 +330,6 @@
       (function () {
         const toggle = document.getElementById('menuToggle');
         const mobile = document.getElementById('mobileMenu');
-        const main = document.getElementById('mainMenu');
 
         if (!toggle || !mobile) return;
 
