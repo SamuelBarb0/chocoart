@@ -98,14 +98,21 @@ class SettingResource extends Resource
 
                         Forms\Components\FileUpload::make('value')
                             ->label('Imagen o Video')
-                            ->acceptedFileTypes(['image/*', 'video/*'])
-                            ->disk('public_uploads')     // ← PRODUCCIÓN
-                            ->directory('settings')      // /media/settings/...
+                            ->disk('public_uploads')
+                            ->directory('settings')
                             ->visibility('public')
-                            ->preserveFilenames()
                             ->maxSize(51200)
+                            ->acceptedFileTypes(['image/*', 'video/*'])
+                            ->image()
+                            ->imagePreviewHeight('150')
+                            ->panelLayout('compact')
+                            ->removeUploadedFileButtonPosition('right')
+                            ->uploadProgressIndicatorPosition('left')
+                            ->imageEditor(false)  // Sin editor de imágenes
+                            ->optimize(false)     // Sin optimización automática
+                            ->resize(false)       // Sin redimensión automática
                             ->visible(fn ($get) => $get('type') === 'image')
-                            ->helperText('Sube imagen o video (máx 50MB). Se guarda en /media/settings')
+                            ->helperText('Archivo máx 50MB. Se guarda en /media/settings/')
                             ->columnSpanFull(),
                     ]),
             ]);

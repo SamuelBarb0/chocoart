@@ -129,6 +129,15 @@ The application uses Eloquent models with the following structure:
 **SeoSetting** (`app/Models/SeoSetting.php`)
 - Global SEO configuration
 
+**Setting** (`app/Models/Setting.php`)
+- Site-wide editable configuration system
+- Groups: `home`, `contact`, `social`, `footer`, `general`
+- Types: text, textarea, email, phone, url, image
+- Cached automatically for performance (1 hour TTL)
+- Static methods: `Setting::get($key, $default)`, `Setting::set($key, $value)`, `Setting::getGroup($group)`
+- Image handling: Auto-strips 'storage/' prefix to prevent path duplication
+- Cache clears automatically on save/delete
+
 ### Filament Admin Panel
 
 The admin panel is accessible at `/admin` and uses Filament 3.3:
@@ -138,21 +147,25 @@ The admin panel is accessible at `/admin` and uses Filament 3.3:
 - Default credentials: admin@chocoart.com / password
 - Brand colors customized to match Chocoart pink theme
 
-**Resources:**
-- ProductResource - Manage products with image uploads, gallery, SEO
-- CourseResource - Manage courses
-- PostResource - Manage blog posts
-- GalleryImageResource - Manage gallery
-- SeoSettingResource - Global SEO settings
+**Resources (in navigation order):**
+1. ProductResource - Manage products with image uploads, gallery, SEO
+2. CourseResource - Manage courses with badge support
+3. GalleryImageResource - Manage gallery images
+4. PostResource - Manage blog posts
+5. SeoSettingResource - Global SEO settings
+6. SettingResource - Site-wide editable configuration (hero video, footer, contact info, feature cards, social links)
 
 **Features:**
 - File uploads stored in `storage/app/public` (symlinked to `public/storage`)
-- Image editor for cropping/resizing
+- Image/video uploads with 50MB max file size
+- Image editor for cropping/resizing (avoid using in SettingResource - causes upload issues)
 - Reorderable galleries
 - Rich text editor for descriptions
 - SEO fields (meta_title, meta_description, meta_keywords)
 - Published/Featured toggles
 - Order field for custom sorting
+- Settings organized by groups with color-coded badges
+- Dynamic form fields based on setting type (text, textarea, email, phone, url, image)
 
 ### Frontend Structure
 
@@ -187,13 +200,13 @@ The admin panel is accessible at `/admin` and uses Filament 3.3:
 Routes are defined in `routes/web.php` using closure-based routing:
 
 **Public Routes:**
-- `GET /` → home view (displays welcome content)
+- `GET /` → home view (fetches products for preview, uses Settings for hero/features)
 - `GET /productos` → productos view (fetches published products from DB)
 - `GET /cursos` → cursos view (fetches published courses from DB)
-- `GET /galeria` → galeria view (fetches gallery images from DB)
+- `GET /galeria` → galeria view (fetches gallery images with categories from DB)
 - `GET /blog` → blog view (fetches published posts from DB)
-- `GET /blog/{slug}` → blog-post view (currently uses hardcoded array, can be converted to DB)
-- `GET /contacto` → contacto view
+- `GET /blog/{slug}` → blog-post view (fetches single post with intelligent related posts)
+- `GET /contacto` → contacto view (uses Settings for contact info)
 - `POST /contacto` → contacto.store (TODO: needs implementation)
 - `GET /media/{path}` → serves files from public storage
 
@@ -207,6 +220,27 @@ Route::get('/productos', function () {
     $productos = Product::where('published', true)->orderBy('order')->get();
     return view('productos', compact('productos'));
 });
+
+Route::get('/', function () {
+    $productos = Product::where('published', true)->orderBy('order')->get();
+    return view('home', compact('productos'));
+});
+```
+
+**Settings Usage in Views:**
+Settings are accessed directly in Blade templates for dynamic content:
+```blade
+{{ \App\Models\Setting::get('home_hero_title', 'Arte con Chocolate') }}
+{{ \App\Models\Setting::get('contact_email', 'info@chocoart.com') }}
+
+@php
+  // For uploaded files (videos/images)
+  $heroVideo = \App\Models\Setting::get('home_hero_video', 'videos/default.mp4');
+  $videoPath = str_starts_with($heroVideo, 'settings/')
+    ? asset('storage/' . $heroVideo)
+    : asset($heroVideo);
+@endphp
+<video src="{{ $videoPath }}" ...>
 ```
 
 **Views Pattern:**
@@ -264,13 +298,22 @@ The contact form currently redirects back with a success message but doesn't pro
 
 ### Adding Content via Filament
 
+**Products, Courses, Posts, Gallery:**
 1. Access admin panel at `/admin`
 2. Login with admin credentials
-3. Use resource forms to add/edit Products, Courses, Posts, Gallery Images
-4. Upload images (automatically stored in `storage/app/public`)
+3. Use resource forms to add/edit content
+4. Upload images (automatically stored in `storage/app/public/{resource}/`)
 5. Set order field to control display sequence (lower = first)
 6. Toggle published/featured as needed
 7. Content automatically appears on frontend routes
+
+**Settings (site-wide configuration):**
+1. Go to Admin Panel → Configuración
+2. Filter by group (Inicio, Contacto, Redes Sociales, Footer)
+3. Click Edit on the setting you want to change
+4. **For file uploads:** Change "Tipo" field to "Imagen" first, then upload field appears
+5. Files save to `storage/app/public/settings/`
+6. Changes appear immediately on frontend (cached for 1 hour)
 
 ## Environment Setup
 
@@ -314,14 +357,120 @@ This project runs in XAMPP environment:
 - Ensure Apache and MySQL are running (if using MySQL instead of SQLite)
 - Ensure `public/storage` symlink exists: `php artisan storage:link`
 
+## Settings System Architecture
+
+The Settings system allows site-wide configuration to be edited through the Filament admin panel without code changes.
+
+### Settings Configuration
+
+**Available Setting Groups:**
+- `home` - Hero section, about section, feature cards (37 total settings)
+- `contact` - Email, phone, WhatsApp, address, hours, map URL
+- `social` - Facebook, Instagram, TikTok, YouTube, Twitter URLs
+- `footer` - About text, copyright, logo
+- `general` - Miscellaneous site-wide settings
+
+**Key Settings:**
+```
+Home:
+  - home_hero_video (image type - accepts video files)
+  - home_hero_title, home_hero_subtitle, home_hero_description
+  - home_about_title, home_about_text_1, home_about_text_2, home_about_image
+  - home_feature_1_icon (color hex), home_feature_1_title, home_feature_1_description
+  - home_feature_2_icon, home_feature_2_title, home_feature_2_description
+  - home_feature_3_icon, home_feature_3_title, home_feature_3_description
+
+Contact:
+  - contact_email, contact_phone, contact_whatsapp
+  - contact_whatsapp_message (pre-filled WhatsApp message)
+  - contact_address, contact_hours, contact_map_url
+
+Social:
+  - social_facebook, social_instagram, social_tiktok
+  - social_youtube, social_twitter
+
+Footer:
+  - footer_about, footer_copyright, footer_logo (image type)
+```
+
+### Seeding Settings
+
+Run `php artisan db:seed --class=SettingsSeeder` to populate default settings. The seeder uses `updateOrCreate()` so it's safe to run multiple times.
+
+### Using Settings in Views
+
+**Simple text values:**
+```blade
+<h1>{{ \App\Models\Setting::get('home_hero_title', 'Default Title') }}</h1>
+<a href="mailto:{{ \App\Models\Setting::get('contact_email', 'info@example.com') }}">
+```
+
+**Conditional rendering (social links):**
+```blade
+@if(\App\Models\Setting::get('social_facebook'))
+  <a href="{{ \App\Models\Setting::get('social_facebook') }}" target="_blank">
+    <!-- Facebook icon -->
+  </a>
+@endif
+```
+
+**File uploads:**
+```blade
+@php
+  $heroVideo = \App\Models\Setting::get('home_hero_video', 'videos/default.mp4');
+  $videoPath = str_starts_with($heroVideo, 'settings/')
+    ? asset('storage/' . $heroVideo)
+    : asset($heroVideo);
+@endphp
+<video src="{{ $videoPath }}" ...>
+```
+
+**Feature cards with dynamic colors:**
+```blade
+<div style="background-color: {{ \App\Models\Setting::get('home_feature_1_icon', '#e28dc4') }}">
+  <h3>{{ \App\Models\Setting::get('home_feature_1_title', 'Title') }}</h3>
+  <p>{{ \App\Models\Setting::get('home_feature_1_description', 'Description') }}</p>
+</div>
+```
+
+### Caching
+
+Settings are automatically cached for 1 hour using Laravel's cache system. Cache is cleared when a setting is saved or deleted via the boot method in the Setting model.
+
 ## Important Implementation Notes
 
 ### File Uploads
 
-- Images uploaded via Filament are stored in `storage/app/public/`
+**Storage Structure:**
+```
+storage/
+  app/
+    public/
+      products/       ← Product images
+      courses/        ← Course images
+      posts/          ← Blog post images
+      gallery/        ← Gallery images
+      settings/       ← Settings images/videos (hero video, footer logo, etc.)
+```
+
+**Setup:**
 - Symlink required: `php artisan storage:link` creates `public/storage -> storage/app/public`
 - Access images in views: `{{ asset('storage/products/image.jpg') }}`
 - Or use media route: `{{ url('/media/products/image.jpg') }}`
+
+**Settings Files:**
+- Settings with type='image' can accept images OR videos
+- Max file size: 50MB
+- Files stored in `settings/` subdirectory
+- Use helper pattern to check if file is uploaded vs. default:
+  ```blade
+  @php
+    $value = \App\Models\Setting::get('key', 'default/path.ext');
+    $path = str_starts_with($value, 'settings/')
+      ? asset('storage/' . $value)  // Uploaded file
+      : asset($value);               // Default file
+  @endphp
+  ```
 
 ### Interactive Components
 
@@ -362,6 +511,70 @@ $posts = Post::published()->orderBy('published_at', 'desc')->get();
 $featured = Product::published()->featured()->get();
 ```
 
+**Related blog posts (intelligent matching):**
+```php
+// Get post
+$post = Post::where('slug', $slug)->where('published', true)->firstOrFail();
+
+// Get related posts (same category first, then fill with recent)
+$relatedPosts = Post::where('published', true)
+    ->where('id', '!=', $post->id)
+    ->where('category', $post->category)
+    ->orderBy('published_at', 'desc')
+    ->take(3)
+    ->get();
+
+// Fill remaining slots with other recent posts
+if ($relatedPosts->count() < 3) {
+    $additionalPosts = Post::where('published', true)
+        ->where('id', '!=', $post->id)
+        ->whereNotIn('id', $relatedPosts->pluck('id'))
+        ->orderBy('published_at', 'desc')
+        ->take(3 - $relatedPosts->count())
+        ->get();
+    $relatedPosts = $relatedPosts->merge($additionalPosts);
+}
+```
+
+**Gallery with categories:**
+```php
+$images = GalleryImage::query()
+    ->orderByDesc('featured')
+    ->orderBy('order')
+    ->orderBy('id')
+    ->get();
+
+$categories = $images->pluck('category')
+    ->filter()
+    ->unique()
+    ->values()
+    ->map(fn ($c) => [
+        'label' => $c,
+        'slug'  => Str::of($c)->lower()->slug('-'),
+    ]);
+```
+
+**Product display on home page:**
+The home page shows the first 4 published products. In Blade:
+```blade
+@if(isset($productos) && $productos->count() > 0)
+  @foreach($productos->take(4) as $producto)
+    @if($producto->image)
+      <!-- Show product image -->
+      <img src="{{ asset('storage/' . $producto->image) }}" ...>
+    @else
+      <!-- Show gradient with icon/emoji -->
+      <div class="bg-gradient-to-br {{ $producto->gradient }}">
+        {{ $producto->icon }}
+      </div>
+    @endif
+    <h3>{{ $producto->name }}</h3>
+  @endforeach
+@else
+  <!-- Fallback: 4 hardcoded example products -->
+@endif
+```
+
 ## Brand Consistency Checklist
 
 When adding features, verify:
@@ -373,4 +586,7 @@ When adding features, verify:
 - [ ] Smooth animations using Tailwind transitions or custom `@keyframes`
 - [ ] Accessibility: proper ARIA labels, keyboard navigation, semantic HTML
 - [ ] Images uploaded via Filament are properly referenced in views
-- [ ] Data fetched from models, not hardcoded (except where noted)
+- [ ] Data fetched from models/Settings, not hardcoded
+- [ ] Settings used for site-wide configuration (contact info, social links, hero content)
+- [ ] Uploaded files (Settings) use proper path checking pattern (settings/ prefix check)
+- [ ] All Spanish labels in Filament resources match existing naming conventions
