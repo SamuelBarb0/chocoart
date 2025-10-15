@@ -98,17 +98,12 @@ class SettingResource extends Resource
 
                         Forms\Components\FileUpload::make('value')
                             ->label('Imagen o Video')
-                            ->disk('public')  // Cambiado a 'public' (storage/app/public)
+                            ->disk('public')
                             ->directory('settings')
-                            ->visibility('public')
-                            ->maxSize(10240)  // 10MB
+                            ->maxSize(10240)
                             ->acceptedFileTypes(['image/*', 'video/*'])
-                            ->imagePreviewHeight('150')
-                            ->panelLayout('compact')
-                            ->removeUploadedFileButtonPosition('right')
-                            ->uploadProgressIndicatorPosition('left')
                             ->visible(fn ($get) => $get('type') === 'image')
-                            ->helperText('Archivo máx 10MB. Se guarda en storage/app/public/settings/')
+                            ->helperText('Máximo 10MB. JPG, PNG, GIF, MP4, WEBM')
                             ->columnSpanFull(),
                     ]),
             ]);
