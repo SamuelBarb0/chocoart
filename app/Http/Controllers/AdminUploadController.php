@@ -32,8 +32,7 @@ class AdminUploadController extends Controller
             'items' => $items,
         ]);
     }
-
-  public function uploadMain(Request $request)
+public function uploadMain(Request $request)
 {
     // FORZAR configuración del directorio temporal
     $tmpDir = '/home/yjopjnuw/tmp/php-uploads';
@@ -150,7 +149,7 @@ class AdminUploadController extends Controller
         \Log::error('EXCEPTION en uploadMain: ' . $e->getMessage());
         \Log::error('Stack trace: ' . $e->getTraceAsString());
         return back()->with('error', 'Error al subir archivo: ' . $e->getMessage());
-    }
+    }
 }
 
     /**
