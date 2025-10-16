@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Blog - Chocoart')
-
 @section('content')
 
 <!-- Hero Blog -->

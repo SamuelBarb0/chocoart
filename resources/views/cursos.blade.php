@@ -5,8 +5,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 @endphp
 
-@section('title', 'Cursos - Chocoart')
-
 @section('content')
 
 <!-- Hero Cursos -->

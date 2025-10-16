@@ -27,15 +27,21 @@ class GalleryImageResource extends Resource
                     ->required(),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\FileUpload::make('image')
-                    ->label('Imagen')
-                    ->image()
-                    ->required()
-                    ->disk('public_uploads')   // ← AQUÍ
-                    ->directory('gallery')
-                    ->visibility('public')
-                    ->maxSize(4096)
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg']),
+                Forms\Components\Placeholder::make('upload_images')
+                    ->label('Subir Imagen')
+                    ->content(function ($record) {
+                        $url = route('admin.uploads.index', ['resource' => 'gallery']);
+                        return new \Illuminate\Support\HtmlString(
+                            '<div class="space-y-3">' .
+                            '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">' .
+                            '📤 Abrir gestor de imágenes' .
+                            '</a>' .
+                            '<p class="text-sm text-gray-600">Sube imágenes en una página separada para evitar problemas de servidor.</p>' .
+                            ($record && $record->image ? '<p class="text-sm text-green-600">✓ Imagen: ' . basename($record->image) . '</p>' : '') .
+                            '</div>'
+                        );
+                    })
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('category'),
                 Forms\Components\TextInput::make('gradient')
                     ->required(),

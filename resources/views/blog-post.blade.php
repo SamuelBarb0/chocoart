@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', $post->title . ' - Blog Chocoart')
-
 @section('content')
 
 <!-- Hero Post -->

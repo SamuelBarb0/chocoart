@@ -96,14 +96,30 @@ class SettingResource extends Resource
                             ->visible(fn ($get) => $get('type') === 'textarea')
                             ->columnSpanFull(),
 
-                        Forms\Components\FileUpload::make('value')
-                            ->label('Imagen o Video')
-                            ->disk('public')
-                            ->directory('settings')
-                            ->maxSize(10240)
-                            ->acceptedFileTypes(['image/*', 'video/*'])
+                        Forms\Components\Placeholder::make('upload_link')
+                            ->label('Subir Imagen o Video')
+                            ->content(function ($record) {
+                                $url = route('settings.upload.index');
+                                return new \Illuminate\Support\HtmlString(
+                                    '<div class="space-y-3">' .
+                                    '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">' .
+                                    '📤 Abrir página de subida de archivos' .
+                                    '</a>' .
+                                    '<p class="text-sm text-gray-600">Los archivos se suben en una página separada para evitar problemas de servidor.</p>' .
+                                    ($record && $record->value ? '<p class="text-sm text-green-600">✓ Archivo actual: ' . basename($record->value) . '</p>' : '') .
+                                    '</div>'
+                                );
+                            })
                             ->visible(fn ($get) => $get('type') === 'image')
-                            ->helperText('Máximo 10MB. JPG, PNG, GIF, MP4, WEBM')
+                            ->columnSpanFull(),
+
+                        Forms\Components\TextInput::make('value')
+                            ->label('Ruta del archivo')
+                            ->placeholder('settings/nombre-archivo.jpg')
+                            ->helperText('Ruta del archivo en storage/app/public/')
+                            ->disabled()
+                            ->dehydrated(true)
+                            ->visible(fn ($get) => $get('type') === 'image')
                             ->columnSpanFull(),
                     ]),
             ]);

@@ -71,27 +71,21 @@ class ProductResource extends Resource
 
                 Forms\Components\Section::make('Imágenes')
                     ->schema([
-                        Forms\Components\FileUpload::make('image')
-                            ->label('Imagen Principal')
-                            ->image()
-                            ->disk('public_uploads')     // ← AQUÍ
-                            ->directory('products')
-                            ->visibility('public')
-                            ->imageEditor()
-                            ->maxSize(4096)
-                            ->helperText('Imagen principal del producto'),
-
-                        Forms\Components\FileUpload::make('images')
-                            ->label('Galería de Imágenes')
-                            ->image()
-                            ->multiple()
-                            ->reorderable()
-                            ->disk('public_uploads')     // ← AQUÍ
-                            ->directory('products/gallery')
-                            ->visibility('public')
-                            ->imageEditor()
-                            ->maxFiles(10)
-                            ->helperText('Imágenes adicionales del producto')
+                        Forms\Components\Placeholder::make('upload_images')
+                            ->label('Gestionar Imágenes')
+                            ->content(function ($record) {
+                                $url = route('admin.uploads.index', ['resource' => 'products']);
+                                return new \Illuminate\Support\HtmlString(
+                                    '<div class="space-y-3">' .
+                                    '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">' .
+                                    '📤 Abrir gestor de imágenes' .
+                                    '</a>' .
+                                    '<p class="text-sm text-gray-600">Sube imagen principal y galería en una página separada para evitar problemas de servidor.</p>' .
+                                    ($record && $record->image ? '<p class="text-sm text-green-600">✓ Imagen principal: ' . basename($record->image) . '</p>' : '') .
+                                    ($record && !empty($record->images) ? '<p class="text-sm text-green-600">✓ Galería: ' . count($record->images) . ' imagen(es)</p>' : '') .
+                                    '</div>'
+                                );
+                            })
                             ->columnSpanFull(),
                     ]),
 

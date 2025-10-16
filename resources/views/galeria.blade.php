@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Galería - Chocoart')
-
 @php
     // Asegura que $images exista como colección
     $images = isset($images) ? collect($images) : collect();

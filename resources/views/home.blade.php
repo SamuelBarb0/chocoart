@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Chocoart - Arte con chocolate | Inicio')
-
 @section('content')
 
 <!-- Hero Banner Section -->
