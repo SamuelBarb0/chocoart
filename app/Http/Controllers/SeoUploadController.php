@@ -39,26 +39,56 @@ class SeoUploadController extends Controller
      */
     public function upload(Request $request)
     {
-        $request->validate([
-            'seo_id' => 'required|integer|exists:seo_settings,id',
-            'file' => 'required|file|max:102400|mimes:jpg,jpeg,png,gif,webp',
-        ]);
+        // Validación manual SIN usar Laravel validation
+        if (!$request->has('seo_id')) {
+            return back()->with('error', 'ID de SEO setting no proporcionado');
+        }
+
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            return back()->with('error', 'No se subió ningún archivo o hubo un error');
+        }
 
         $seoSetting = SeoSetting::findOrFail($request->seo_id);
 
         try {
+            // Obtener info del archivo desde $_FILES
+            $uploadedFile = $_FILES['file'];
+            $tmpName = $uploadedFile['tmp_name'];
+            $originalName = basename($uploadedFile['name']);
+
+            // Validación de extensión
+            $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!in_array($ext, $allowedExts)) {
+                return back()->with('error', 'Tipo de archivo no permitido');
+            }
+
+            // Validación de tamaño (100MB)
+            if ($uploadedFile['size'] > 104857600) {
+                return back()->with('error', 'Archivo demasiado grande (máx 100MB)');
+            }
+
             // Eliminar archivo anterior si existe
             if ($seoSetting->og_image && Storage::disk('public')->exists($seoSetting->og_image)) {
                 Storage::disk('public')->delete($seoSetting->og_image);
             }
 
-            // Subir nuevo archivo
-            $file = $request->file('file');
-            $filename = time() . '-' . str_replace(' ', '-', $file->getClientOriginalName());
-            $path = $file->storeAs('seo/og', $filename, 'public');
+            // Crear directorio si no existe
+            $directory = storage_path('app/public/seo/og');
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Crear nombre único y mover archivo
+            $filename = time() . '-' . str_replace(' ', '-', $originalName);
+            $destinationPath = $directory . '/' . $filename;
+
+            if (!move_uploaded_file($tmpName, $destinationPath)) {
+                return back()->with('error', 'Error al mover el archivo');
+            }
 
             // Actualizar modelo
-            $seoSetting->og_image = $path;
+            $seoSetting->og_image = 'seo/og/' . $filename;
             $seoSetting->save();
 
             return back()->with('success', "Imagen OG subida para: {$seoSetting->page}");
@@ -72,9 +102,10 @@ class SeoUploadController extends Controller
      */
     public function delete(Request $request)
     {
-        $request->validate([
-            'seo_id' => 'required|integer|exists:seo_settings,id',
-        ]);
+        // Sin validación de Laravel
+        if (!$request->has('seo_id')) {
+            return back()->with('error', 'ID de SEO setting no proporcionado');
+        }
 
         $seoSetting = SeoSetting::findOrFail($request->seo_id);
 

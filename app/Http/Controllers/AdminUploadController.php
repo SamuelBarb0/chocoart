@@ -38,11 +38,14 @@ class AdminUploadController extends Controller
      */
     public function uploadMain(Request $request)
     {
-        $request->validate([
-            'resource' => 'required|string',
-            'item_id' => 'required|integer',
-            'file' => 'required|file|max:102400|mimes:jpg,jpeg,png,gif,webp,mp4,webm,mov',
-        ]);
+        // Validación manual SIN usar Laravel validation (evita problemas con /tmp)
+        if (!$request->has('resource') || !$request->has('item_id')) {
+            return back()->with('error', 'Datos incompletos');
+        }
+
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            return back()->with('error', 'No se subió ningún archivo o hubo un error');
+        }
 
         $config = $this->getResourceConfig($request->resource);
         if (!$config) {
@@ -52,17 +55,45 @@ class AdminUploadController extends Controller
         $item = $config['model']::findOrFail($request->item_id);
 
         try {
+            // Obtener info del archivo desde $_FILES directamente
+            $uploadedFile = $_FILES['file'];
+            $tmpName = $uploadedFile['tmp_name'];
+            $originalName = basename($uploadedFile['name']);
+
+            // Validación simple de extensión
+            $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'webm', 'mov'];
+            if (!in_array($ext, $allowedExts)) {
+                return back()->with('error', 'Tipo de archivo no permitido');
+            }
+
+            // Validación de tamaño (100MB)
+            if ($uploadedFile['size'] > 104857600) {
+                return back()->with('error', 'Archivo demasiado grande (máx 100MB)');
+            }
+
             // Eliminar archivo anterior si existe
             if ($item->{$config['field']} && Storage::disk('public')->exists($item->{$config['field']})) {
                 Storage::disk('public')->delete($item->{$config['field']});
             }
 
-            // Subir nuevo archivo
-            $file = $request->file('file');
-            $filename = time() . '-' . str_replace(' ', '-', $file->getClientOriginalName());
-            $path = $file->storeAs($config['directory'], $filename, 'public');
+            // Crear nombre único
+            $filename = time() . '-' . str_replace(' ', '-', $originalName);
+            $directory = storage_path('app/public/' . $config['directory']);
+
+            // Crear directorio si no existe
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Mover archivo directamente sin usar Laravel
+            $destinationPath = $directory . '/' . $filename;
+            if (!move_uploaded_file($tmpName, $destinationPath)) {
+                return back()->with('error', 'Error al mover el archivo');
+            }
 
             // Actualizar modelo
+            $path = $config['directory'] . '/' . $filename;
             $item->{$config['field']} = $path;
             $item->save();
 
@@ -77,11 +108,14 @@ class AdminUploadController extends Controller
      */
     public function uploadGallery(Request $request)
     {
-        $request->validate([
-            'resource' => 'required|string',
-            'item_id' => 'required|integer',
-            'files.*' => 'required|file|max:102400|mimes:jpg,jpeg,png,gif,webp',
-        ]);
+        // Validación manual SIN usar Laravel validation
+        if (!$request->has('resource') || !$request->has('item_id')) {
+            return back()->with('error', 'Datos incompletos');
+        }
+
+        if (!isset($_FILES['files']) || empty($_FILES['files']['name'])) {
+            return back()->with('error', 'No se subieron archivos');
+        }
 
         $config = $this->getResourceConfig($request->resource);
         if (!$config || !$config['has_gallery']) {
@@ -93,11 +127,48 @@ class AdminUploadController extends Controller
         try {
             $currentGallery = $item->images ?? [];
             $newImages = [];
+            $files = $_FILES['files'];
+            $directory = storage_path('app/public/' . $config['directory']);
 
-            foreach ($request->file('files') as $file) {
-                $filename = time() . '-' . uniqid() . '-' . str_replace(' ', '-', $file->getClientOriginalName());
-                $path = $file->storeAs($config['directory'], $filename, 'public');
-                $newImages[] = $path;
+            // Crear directorio si no existe
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Procesar cada archivo
+            $fileCount = count($files['name']);
+            for ($i = 0; $i < $fileCount; $i++) {
+                if ($files['error'][$i] !== UPLOAD_ERR_OK) {
+                    continue;
+                }
+
+                $tmpName = $files['tmp_name'][$i];
+                $originalName = basename($files['name'][$i]);
+
+                // Validación de extensión
+                $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                if (!in_array($ext, $allowedExts)) {
+                    continue;
+                }
+
+                // Validación de tamaño (100MB)
+                if ($files['size'][$i] > 104857600) {
+                    continue;
+                }
+
+                // Crear nombre único
+                $filename = time() . '-' . uniqid() . '-' . str_replace(' ', '-', $originalName);
+                $destinationPath = $directory . '/' . $filename;
+
+                // Mover archivo
+                if (move_uploaded_file($tmpName, $destinationPath)) {
+                    $newImages[] = $config['directory'] . '/' . $filename;
+                }
+            }
+
+            if (empty($newImages)) {
+                return back()->with('error', 'No se pudieron subir los archivos');
             }
 
             // Agregar a la galería existente
@@ -116,11 +187,10 @@ class AdminUploadController extends Controller
      */
     public function deleteGalleryImage(Request $request)
     {
-        $request->validate([
-            'resource' => 'required|string',
-            'item_id' => 'required|integer',
-            'image_path' => 'required|string',
-        ]);
+        // Sin validación de Laravel
+        if (!$request->has('resource') || !$request->has('item_id') || !$request->has('image_path')) {
+            return back()->with('error', 'Datos incompletos');
+        }
 
         $config = $this->getResourceConfig($request->resource);
         if (!$config || !$config['has_gallery']) {
