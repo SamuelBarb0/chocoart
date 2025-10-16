@@ -32,23 +32,39 @@ class AdminUploadController extends Controller
             'items' => $items,
         ]);
     }
+    
 public function uploadMain(Request $request)
 {
-    // FORZAR configuración del directorio temporal
-    $tmpDir = '/home/yjopjnuw/tmp/php-uploads';
-    ini_set('upload_tmp_dir', $tmpDir);
-    ini_set('sys_temp_dir', $tmpDir);
+    // ===== SOLUCIÓN PARA CLOUDLINUX/LITESPEED =====
+    // Crear y usar directorio temporal dentro del proyecto
+    $customTmpDir = storage_path('framework/tmp');
+    if (!is_dir($customTmpDir)) {
+        mkdir($customTmpDir, 0777, true);
+    }
+    
+    // Forzar variables de entorno
+    putenv("TMPDIR={$customTmpDir}");
+    putenv("TEMP={$customTmpDir}");
+    putenv("TMP={$customTmpDir}");
+    $_ENV['TMPDIR'] = $customTmpDir;
+    $_SERVER['TMPDIR'] = $customTmpDir;
+    
+    // Intentar cambiar configuración PHP (puede no funcionar en CloudLinux)
+    @ini_set('upload_tmp_dir', $customTmpDir);
+    @ini_set('sys_temp_dir', $customTmpDir);
     
     \Log::info('=== INICIO uploadMain ===');
-    \Log::info('📁 Upload tmp dir configurado: ' . ini_get('upload_tmp_dir'));
+    \Log::info('📁 Custom tmp dir: ' . $customTmpDir);
+    \Log::info('📁 Upload tmp dir: ' . ini_get('upload_tmp_dir'));
     \Log::info('📁 Sys temp dir: ' . sys_get_temp_dir());
-    \Log::info('✓ ¿Directorio temporal existe?: ' . (is_dir($tmpDir) ? 'SÍ' : 'NO'));
-    \Log::info('✓ ¿Directorio temporal escribible?: ' . (is_writable($tmpDir) ? 'SÍ' : 'NO'));
+    \Log::info('📁 TMPDIR env: ' . getenv('TMPDIR'));
+    \Log::info('✓ ¿Custom dir existe?: ' . (is_dir($customTmpDir) ? 'SÍ' : 'NO'));
+    \Log::info('✓ ¿Custom dir escribible?: ' . (is_writable($customTmpDir) ? 'SÍ' : 'NO'));
     
     \Log::info('Request data:', $request->all());
     \Log::info('$_FILES:', $_FILES);
 
-    // Validación manual SIN usar Laravel validation (evita problemas con /tmp)
+    // Validación manual SIN usar Laravel validation
     if (!$request->has('resource') || !$request->has('item_id')) {
         \Log::error('ERROR: Datos incompletos - resource o item_id faltante');
         return back()->with('error', 'Datos incompletos');
