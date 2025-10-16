@@ -90,18 +90,11 @@ class ProductResource extends Resource
                     ]),
 
                 Forms\Components\Section::make('Diseño')
+                    ->description('El icono se gestiona desde: /admin/uploads?resource=products (o usa emoji directamente: 🍫)')
                     ->schema([
-                        Forms\Components\Placeholder::make('icon_info')
-                            ->label('Icono/Imagen')
-                            ->content(function ($record) {
-                                return new \Illuminate\Support\HtmlString(
-                                    '<div class="space-y-3">' .
-                                    '<p class="text-sm text-gray-600">El icono se puede gestionar desde el <strong>Gestor de Imágenes</strong> (junto con imagen principal y galería).</p>' .
-                                    '<p class="text-sm text-gray-600">O usa un <strong>emoji</strong> directamente: 🍫 🍰 🎂 🧁</p>' .
-                                    ($record && $record->icon ? '<p class="text-sm text-green-600">✓ Icon actual: ' . $record->icon . '</p>' : '<p class="text-sm text-yellow-600">⚠️ Sin icono definido</p>') .
-                                    '</div>'
-                                );
-                            }),
+                        Forms\Components\TextInput::make('icon')
+                            ->label('Icono (emoji o ruta)')
+                            ->helperText('Escribe emoji (🍫 🍰 🎂) o gestiona imagen desde /admin/uploads'),
                         Forms\Components\TextInput::make('gradient')
                             ->label('Gradiente')
                             ->required()
