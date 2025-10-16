@@ -38,21 +38,38 @@ class AdminUploadController extends Controller
      */
     public function uploadMain(Request $request)
     {
+        \Log::info('=== INICIO uploadMain ===');
+        \Log::info('Request data:', $request->all());
+        \Log::info('$_FILES:', $_FILES);
+
         // Validación manual SIN usar Laravel validation (evita problemas con /tmp)
         if (!$request->has('resource') || !$request->has('item_id')) {
+            \Log::error('ERROR: Datos incompletos - resource o item_id faltante');
             return back()->with('error', 'Datos incompletos');
         }
 
-        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-            return back()->with('error', 'No se subió ningún archivo o hubo un error');
+        \Log::info('Verificando $_FILES...');
+        if (!isset($_FILES['file'])) {
+            \Log::error('ERROR: $_FILES[file] no existe');
+            return back()->with('error', 'No se recibió ningún archivo');
+        }
+
+        if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            $errorCode = $_FILES['file']['error'];
+            \Log::error('ERROR: Upload error code: ' . $errorCode);
+            \Log::error('Error messages: ' . $this->getUploadErrorMessage($errorCode));
+            return back()->with('error', 'Error al subir archivo (código: ' . $errorCode . ')');
         }
 
         $config = $this->getResourceConfig($request->resource);
         if (!$config) {
+            \Log::error('ERROR: Recurso no válido: ' . $request->resource);
             return back()->with('error', 'Recurso no válido');
         }
+        \Log::info('Config obtenida:', $config);
 
         $item = $config['model']::findOrFail($request->item_id);
+        \Log::info('Item encontrado: ' . $item->name . ' (ID: ' . $item->id . ')');
 
         try {
             // Obtener info del archivo desde $_FILES directamente
@@ -60,47 +77,90 @@ class AdminUploadController extends Controller
             $tmpName = $uploadedFile['tmp_name'];
             $originalName = basename($uploadedFile['name']);
 
+            \Log::info('Archivo: ' . $originalName);
+            \Log::info('Temp path: ' . $tmpName);
+            \Log::info('Size: ' . $uploadedFile['size'] . ' bytes');
+
             // Validación simple de extensión
             $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
             $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'webm', 'mov'];
+            \Log::info('Extensión: ' . $ext);
+
             if (!in_array($ext, $allowedExts)) {
+                \Log::error('ERROR: Extensión no permitida: ' . $ext);
                 return back()->with('error', 'Tipo de archivo no permitido');
             }
 
             // Validación de tamaño (100MB)
             if ($uploadedFile['size'] > 104857600) {
+                \Log::error('ERROR: Archivo demasiado grande: ' . $uploadedFile['size']);
                 return back()->with('error', 'Archivo demasiado grande (máx 100MB)');
             }
 
             // Eliminar archivo anterior si existe
             if ($item->{$config['field']} && Storage::disk('public')->exists($item->{$config['field']})) {
+                \Log::info('Eliminando archivo anterior: ' . $item->{$config['field']});
                 Storage::disk('public')->delete($item->{$config['field']});
             }
 
             // Crear nombre único
             $filename = time() . '-' . str_replace(' ', '-', $originalName);
             $directory = storage_path('app/public/' . $config['directory']);
+            \Log::info('Directorio destino: ' . $directory);
+            \Log::info('Filename: ' . $filename);
 
             // Crear directorio si no existe
             if (!is_dir($directory)) {
+                \Log::info('Creando directorio...');
                 mkdir($directory, 0755, true);
             }
 
             // Mover archivo directamente sin usar Laravel
             $destinationPath = $directory . '/' . $filename;
+            \Log::info('Ruta completa destino: ' . $destinationPath);
+            \Log::info('¿Archivo temporal existe? ' . (file_exists($tmpName) ? 'SÍ' : 'NO'));
+            \Log::info('¿Directorio escribible? ' . (is_writable($directory) ? 'SÍ' : 'NO'));
+
             if (!move_uploaded_file($tmpName, $destinationPath)) {
+                \Log::error('ERROR: move_uploaded_file() falló');
+                \Log::error('Último error PHP: ' . print_r(error_get_last(), true));
                 return back()->with('error', 'Error al mover el archivo');
             }
+
+            \Log::info('✅ Archivo movido exitosamente');
+            \Log::info('¿Archivo existe en destino? ' . (file_exists($destinationPath) ? 'SÍ' : 'NO'));
 
             // Actualizar modelo
             $path = $config['directory'] . '/' . $filename;
             $item->{$config['field']} = $path;
             $item->save();
 
+            \Log::info('✅ Modelo actualizado. Campo: ' . $config['field'] . ' = ' . $path);
+            \Log::info('=== FIN uploadMain EXITOSO ===');
+
             return back()->with('success', "Imagen principal subida para: {$item->name}");
         } catch (\Exception $e) {
+            \Log::error('EXCEPTION en uploadMain: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', 'Error al subir archivo: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Helper para mensajes de error de upload
+     */
+    private function getUploadErrorMessage($errorCode)
+    {
+        $errors = [
+            UPLOAD_ERR_INI_SIZE => 'El archivo excede upload_max_filesize en php.ini',
+            UPLOAD_ERR_FORM_SIZE => 'El archivo excede MAX_FILE_SIZE del formulario',
+            UPLOAD_ERR_PARTIAL => 'El archivo fue subido parcialmente',
+            UPLOAD_ERR_NO_FILE => 'No se subió ningún archivo',
+            UPLOAD_ERR_NO_TMP_DIR => 'Falta el directorio temporal',
+            UPLOAD_ERR_CANT_WRITE => 'No se pudo escribir el archivo en disco',
+            UPLOAD_ERR_EXTENSION => 'Una extensión PHP detuvo la subida',
+        ];
+        return $errors[$errorCode] ?? 'Error desconocido';
     }
 
     /**
