@@ -74,14 +74,21 @@ class SeoSettingResource extends Resource
                             ->rows(3)
                             ->maxLength(200)
                             ->columnSpanFull(),
-                        Forms\Components\FileUpload::make('og_image')
-                            ->label('OG Imagen')
-                            ->image()
-                            ->disk('public_uploads')     // ← PRODUCCIÓN
-                            ->directory('seo/og')        // /media/seo/og/...
-                            ->visibility('public')
-                            ->preserveFilenames()
-                            ->helperText('Recomendado 1200×630px. Se guarda como ruta relativa en /media.'),
+                        Forms\Components\Placeholder::make('upload_og_image')
+                            ->label('Gestionar Imagen OG')
+                            ->content(function ($record) {
+                                $url = route('seo.upload.index');
+                                return new \Illuminate\Support\HtmlString(
+                                    '<div class="space-y-3">' .
+                                    '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">' .
+                                    '📤 Abrir gestor de imágenes OG' .
+                                    '</a>' .
+                                    '<p class="text-sm text-gray-600">Sube imágenes Open Graph (1200×630px) en una página separada para evitar problemas de servidor.</p>' .
+                                    ($record && $record->og_image ? '<p class="text-sm text-green-600">✓ Imagen OG: ' . basename($record->og_image) . '</p>' : '<p class="text-sm text-yellow-600">⚠️ Sin imagen OG</p>') .
+                                    '</div>'
+                                );
+                            })
+                            ->columnSpanFull(),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Avanzado')

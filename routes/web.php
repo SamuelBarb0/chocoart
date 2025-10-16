@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Http\Controllers\SettingUploadController;
 use App\Http\Controllers\AdminUploadController;
+use App\Http\Controllers\SeoUploadController;
 
 // Home page
 Route::get('/', function () {
@@ -104,6 +105,13 @@ Route::middleware(['web'])->group(function () {
     Route::post('/admin/uploads/main', [AdminUploadController::class, 'uploadMain'])->name('admin.uploads.main');
     Route::post('/admin/uploads/gallery', [AdminUploadController::class, 'uploadGallery'])->name('admin.uploads.gallery');
     Route::delete('/admin/uploads/gallery', [AdminUploadController::class, 'deleteGalleryImage'])->name('admin.uploads.gallery.delete');
+});
+
+// Admin: Subir imágenes OG para SEO
+Route::middleware(['web'])->group(function () {
+    Route::get('/admin/seo-upload', [SeoUploadController::class, 'index'])->name('seo.upload.index');
+    Route::post('/admin/seo-upload', [SeoUploadController::class, 'upload'])->name('seo.upload.store');
+    Route::delete('/admin/seo-upload', [SeoUploadController::class, 'delete'])->name('seo.upload.delete');
 });
 
 Route::get('/media/{path}', function (string $path) {
