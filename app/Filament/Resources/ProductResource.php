@@ -70,15 +70,44 @@ class ProductResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('Imágenes')
-                    ->description('⚠️ Las imágenes (principal, galería, icono) se gestionan SOLO desde: /admin/uploads?resource=products (fuera de Filament)')
                     ->schema([
-                        // Sin campos - todo se gestiona externamente
-                    ])
-                    ->collapsed(),
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Imagen Principal')
+                            ->image()
+                            ->disk('public')
+                            ->directory('products')
+                            ->imageEditor()
+                            ->maxSize(51200)
+                            ->helperText('Tamaño máximo: 50MB')
+                            ->downloadable()
+                            ->openable()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ]),
+                        Forms\Components\FileUpload::make('images')
+                            ->label('Galería de Imágenes')
+                            ->image()
+                            ->disk('public')
+                            ->directory('products')
+                            ->multiple()
+                            ->reorderable()
+                            ->maxFiles(10)
+                            ->maxSize(51200)
+                            ->helperText('Puedes subir hasta 10 imágenes. Arrastra para reordenar.')
+                            ->downloadable()
+                            ->openable()
+                            ->columnSpanFull(),
+                    ])->columns(2),
 
                 Forms\Components\Section::make('Diseño')
-                    ->description('⚠️ El icono se gestiona SOLO desde: /admin/uploads?resource=products (fuera de Filament)')
                     ->schema([
+                        Forms\Components\TextInput::make('icon')
+                            ->label('Icono/Emoji')
+                            ->maxLength(10)
+                            ->helperText('Emoji o texto corto para mostrar cuando no hay imagen'),
                         Forms\Components\TextInput::make('gradient')
                             ->label('Gradiente')
                             ->required()
@@ -90,7 +119,7 @@ class ProductResource extends Resource
                             ->numeric()
                             ->default(0)
                             ->helperText('Orden de visualización (menor = primero)'),
-                    ])->columns(2),
+                    ])->columns(3),
 
                 Forms\Components\Section::make('Estado')
                     ->schema([
@@ -106,7 +135,6 @@ class ProductResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('SEO')
-                    ->description('Optimización para motores de búsqueda')
                     ->schema([
                         Forms\Components\TextInput::make('meta_title')
                             ->label('Meta Título')
@@ -131,7 +159,7 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('Imagen')
-                    ->disk('public_uploads')   // ← AQUÍ
+                    ->disk('public')
                     ->circular(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')

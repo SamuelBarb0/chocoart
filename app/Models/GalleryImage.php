@@ -42,11 +42,19 @@ class GalleryImage extends Model
         return str($this->category ?? 'otros')->lower()->slug('-');
     }
 
-    public function getImageUrlAttribute(): string
+    public function getImageUrlAttribute(): ?string
     {
-        return str($this->image)->startsWith(['http://','https://'])
-            ? $this->image
-            : \Illuminate\Support\Facades\Storage::url($this->image);
+        if (!$this->image) {
+            return null;
+        }
+
+        // Si ya es URL completa, retornarla
+        if (str($this->image)->startsWith(['http://', 'https://'])) {
+            return $this->image;
+        }
+
+        // Generar URL usando asset con storage/
+        return asset('storage/' . $this->image);
     }
 
     /** Scopes */

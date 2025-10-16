@@ -56,9 +56,45 @@ class CourseResource extends Resource
                             ->columnSpanFull(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Diseño Visual')
-                    ->description('⚠️ Las imágenes (icono, principal, galería) se gestionan SOLO desde: /admin/uploads?resource=courses (fuera de Filament)')
+                Forms\Components\Section::make('Imágenes')
                     ->schema([
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Imagen Principal')
+                            ->image()
+                            ->disk('public')
+                            ->directory('courses')
+                            ->imageEditor()
+                            ->maxSize(51200)
+                            ->helperText('Tamaño máximo: 50MB')
+                            ->downloadable()
+                            ->openable()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ]),
+                        Forms\Components\FileUpload::make('images')
+                            ->label('Galería de Imágenes')
+                            ->image()
+                            ->disk('public')
+                            ->directory('courses')
+                            ->multiple()
+                            ->reorderable()
+                            ->maxFiles(10)
+                            ->maxSize(51200)
+                            ->helperText('Puedes subir hasta 10 imágenes. Arrastra para reordenar.')
+                            ->downloadable()
+                            ->openable()
+                            ->columnSpanFull(),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Diseño Visual')
+                    ->schema([
+                        Forms\Components\TextInput::make('icon')
+                            ->label('Icono/Emoji')
+                            ->maxLength(10)
+                            ->helperText('Emoji o texto corto para mostrar cuando no hay imagen'),
                         Forms\Components\TextInput::make('color')
                             ->label('Gradiente')
                             ->required()
@@ -111,7 +147,6 @@ class CourseResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('SEO')
-                    ->description('Optimización para motores de búsqueda')
                     ->schema([
                         Forms\Components\TextInput::make('meta_title')
                             ->label('Meta Título')

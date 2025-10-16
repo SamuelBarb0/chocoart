@@ -19,24 +19,74 @@ class GalleryImageResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Galería';
+
+    protected static ?string $modelLabel = 'Imagen';
+
+    protected static ?string $pluralModelLabel = 'Imágenes de Galería';
+
+    protected static ?int $navigationSort = 3;
+
     public static function form(Form $form): Form
     {
         return $form
-            ->description('⚠️ Las imágenes se gestionan SOLO desde: /admin/uploads?resource=gallery (fuera de Filament)')
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('category'),
-                Forms\Components\TextInput::make('gradient')
-                    ->required(),
-                Forms\Components\Toggle::make('featured')
-                    ->required(),
-                Forms\Components\TextInput::make('order')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
+                Forms\Components\Section::make('Información de la Imagen')
+                    ->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->label('Título')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('description')
+                            ->label('Descripción')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('category')
+                            ->label('Categoría')
+                            ->helperText('Ej: Productos, Cursos, Eventos, etc.'),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Imagen')
+                    ->schema([
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Imagen')
+                            ->image()
+                            ->disk('public')
+                            ->directory('gallery')
+                            ->imageEditor()
+                            ->maxSize(51200)
+                            ->required()
+                            ->helperText('Tamaño máximo: 50MB')
+                            ->downloadable()
+                            ->openable()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+
+                Forms\Components\Section::make('Diseño y Orden')
+                    ->schema([
+                        Forms\Components\TextInput::make('gradient')
+                            ->label('Gradiente')
+                            ->required()
+                            ->default('from-[#e28dc4] to-[#81cacf]')
+                            ->helperText('Clases Tailwind para el gradiente de fondo'),
+                        Forms\Components\Toggle::make('featured')
+                            ->label('Destacada')
+                            ->default(false)
+                            ->inline(false)
+                            ->helperText('Las imágenes destacadas aparecen primero'),
+                        Forms\Components\TextInput::make('order')
+                            ->label('Orden')
+                            ->required()
+                            ->numeric()
+                            ->default(0)
+                            ->helperText('Orden de visualización (menor = primero)'),
+                    ])->columns(3),
             ]);
     }
 
@@ -44,40 +94,54 @@ class GalleryImageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
                 Tables\Columns\ImageColumn::make('image')
+                    ->label('Imagen')
                     ->disk('public')
-                    ->square(),
+                    ->square()
+                    ->size(60),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('Título')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(40),
                 Tables\Columns\TextColumn::make('category')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('gradient')
-                    ->searchable(),
+                    ->label('Categoría')
+                    ->badge()
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('featured')
-                    ->boolean(),
+                    ->label('Destacada')
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('order')
+                    ->label('Orden')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('featured')
+                    ->label('Destacada'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('order', 'asc');
     }
 
     public static function getRelations(): array

@@ -69,6 +69,39 @@ class PostResource extends Resource
                             ->columnSpanFull(),
                     ])->columns(2),
 
+                Forms\Components\Section::make('Imágenes')
+                    ->schema([
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Imagen Principal')
+                            ->image()
+                            ->disk('public')
+                            ->directory('posts')
+                            ->imageEditor()
+                            ->maxSize(51200)
+                            ->helperText('Tamaño máximo: 50MB')
+                            ->downloadable()
+                            ->openable()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ]),
+                        Forms\Components\FileUpload::make('images')
+                            ->label('Galería de Imágenes')
+                            ->image()
+                            ->disk('public')
+                            ->directory('posts')
+                            ->multiple()
+                            ->reorderable()
+                            ->maxFiles(10)
+                            ->maxSize(51200)
+                            ->helperText('Puedes subir hasta 10 imágenes. Arrastra para reordenar.')
+                            ->downloadable()
+                            ->openable()
+                            ->columnSpanFull(),
+                    ])->columns(2),
+
                 Forms\Components\Section::make('Diseño')
                     ->schema([
                         Forms\Components\TextInput::make('icon')
@@ -103,7 +136,6 @@ class PostResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('SEO')
-                    ->description('⚠️ Optimización SEO | Las imágenes se gestionan SOLO desde: /admin/uploads?resource=posts (fuera de Filament)')
                     ->schema([
                         Forms\Components\TextInput::make('meta_title')
                             ->label('Meta Título')
