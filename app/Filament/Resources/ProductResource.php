@@ -70,31 +70,15 @@ class ProductResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('Imágenes')
+                    ->description('⚠️ Las imágenes (principal, galería, icono) se gestionan SOLO desde: /admin/uploads?resource=products (fuera de Filament)')
                     ->schema([
-                        Forms\Components\Placeholder::make('upload_images')
-                            ->label('Gestionar Imágenes')
-                            ->content(function ($record) {
-                                $url = route('admin.uploads.index', ['resource' => 'products']);
-                                return new \Illuminate\Support\HtmlString(
-                                    '<div class="space-y-3">' .
-                                    '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">' .
-                                    '📤 Abrir gestor de imágenes' .
-                                    '</a>' .
-                                    '<p class="text-sm text-gray-600">Sube imagen principal y galería en una página separada para evitar problemas de servidor.</p>' .
-                                    ($record && $record->image ? '<p class="text-sm text-green-600">✓ Imagen principal: ' . basename($record->image) . '</p>' : '') .
-                                    ($record && !empty($record->images) ? '<p class="text-sm text-green-600">✓ Galería: ' . count($record->images) . ' imagen(es)</p>' : '') .
-                                    '</div>'
-                                );
-                            })
-                            ->columnSpanFull(),
-                    ]),
+                        // Sin campos - todo se gestiona externamente
+                    ])
+                    ->collapsed(),
 
                 Forms\Components\Section::make('Diseño')
-                    ->description('El icono se gestiona desde: /admin/uploads?resource=products (o usa emoji directamente: 🍫)')
+                    ->description('⚠️ El icono se gestiona SOLO desde: /admin/uploads?resource=products (fuera de Filament)')
                     ->schema([
-                        Forms\Components\TextInput::make('icon')
-                            ->label('Icono (emoji o ruta)')
-                            ->helperText('Escribe emoji (🍫 🍰 🎂) o gestiona imagen desde /admin/uploads'),
                         Forms\Components\TextInput::make('gradient')
                             ->label('Gradiente')
                             ->required()
@@ -106,7 +90,7 @@ class ProductResource extends Resource
                             ->numeric()
                             ->default(0)
                             ->helperText('Orden de visualización (menor = primero)'),
-                    ])->columns(3),
+                    ])->columns(2),
 
                 Forms\Components\Section::make('Estado')
                     ->schema([

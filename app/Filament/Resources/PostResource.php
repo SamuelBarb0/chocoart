@@ -103,7 +103,7 @@ class PostResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('SEO')
-                    ->description('Optimización para motores de búsqueda')
+                    ->description('⚠️ Optimización SEO | Las imágenes se gestionan SOLO desde: /admin/uploads?resource=posts (fuera de Filament)')
                     ->schema([
                         Forms\Components\TextInput::make('meta_title')
                             ->label('Meta Título')
@@ -118,21 +118,6 @@ class PostResource extends Resource
                         Forms\Components\TextInput::make('meta_keywords')
                             ->label('Palabras Clave')
                             ->helperText('Separadas por comas (ej: chocolate, templado, técnicas)'),
-                        Forms\Components\Placeholder::make('upload_images_note')
-                            ->label('Imágenes del Post')
-                            ->content(function ($record) {
-                                $url = route('admin.uploads.index', ['resource' => 'posts']);
-                                return new \Illuminate\Support\HtmlString(
-                                    '<div class="space-y-2">' .
-                                    '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm">' .
-                                    '📤 Abrir gestor de imágenes' .
-                                    '</a>' .
-                                    '<p class="text-xs text-gray-600">Sube imágenes principal, galería y Open Graph en la página externa.</p>' .
-                                    ($record && $record->image ? '<p class="text-xs text-green-600">✓ Imagen: ' . basename($record->image) . '</p>' : '') .
-                                    '</div>'
-                                );
-                            })
-                            ->columnSpanFull(),
                     ])->columns(2)->collapsed(),
             ]);
     }

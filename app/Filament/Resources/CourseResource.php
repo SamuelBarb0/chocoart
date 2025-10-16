@@ -57,23 +57,8 @@ class CourseResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('Diseño Visual')
+                    ->description('⚠️ Las imágenes (icono, principal, galería) se gestionan SOLO desde: /admin/uploads?resource=courses (fuera de Filament)')
                     ->schema([
-                        Forms\Components\Placeholder::make('upload_images')
-                            ->label('Gestionar Imágenes')
-                            ->content(function ($record) {
-                                $url = route('admin.uploads.index', ['resource' => 'courses']);
-                                return new \Illuminate\Support\HtmlString(
-                                    '<div class="space-y-3">' .
-                                    '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">' .
-                                    '📤 Abrir gestor de imágenes' .
-                                    '</a>' .
-                                    '<p class="text-sm text-gray-600">Sube imágenes en una página separada para evitar problemas de servidor.</p>' .
-                                    ($record && $record->icon ? '<p class="text-sm text-green-600">✓ Icono: ' . basename($record->icon) . '</p>' : '') .
-                                    ($record && $record->image ? '<p class="text-sm text-green-600">✓ Imagen principal: ' . basename($record->image) . '</p>' : '') .
-                                    ($record && !empty($record->images) ? '<p class="text-sm text-green-600">✓ Galería: ' . count($record->images) . ' imagen(es)</p>' : '') .
-                                    '</div>'
-                                );
-                            }),
                         Forms\Components\TextInput::make('color')
                             ->label('Gradiente')
                             ->required()

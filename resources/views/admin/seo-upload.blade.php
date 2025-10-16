@@ -171,7 +171,7 @@
                                 📤 Subir imagen OG
                             </button>
                         </form>
-                    </div>
+                    </div> 
                 @empty
                     <div class="col-span-2 bg-white rounded-lg shadow-md p-12 text-center">
                         <p class="text-gray-500 text-lg">No hay configuraciones SEO disponibles.</p>

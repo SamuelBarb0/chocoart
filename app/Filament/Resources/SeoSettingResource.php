@@ -61,7 +61,7 @@ class SeoSettingResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('Open Graph / Social')
-                    ->description('Las imágenes OG se gestionan desde: /admin/seo-upload')
+                    ->description('⚠️ Las imágenes OG se gestionan SOLO desde: /admin/seo-upload (fuera de Filament)')
                     ->schema([
                         Forms\Components\TextInput::make('og_title')
                             ->label('OG Título')
@@ -74,12 +74,6 @@ class SeoSettingResource extends Resource
                             ->label('OG Descripción')
                             ->rows(3)
                             ->maxLength(200)
-                            ->columnSpanFull(),
-                        Forms\Components\TextInput::make('og_image')
-                            ->label('Imagen OG (solo lectura)')
-                            ->disabled()
-                            ->dehydrated()
-                            ->helperText('Para cambiar la imagen, ve a: /admin/seo-upload')
                             ->columnSpanFull(),
                     ])->columns(2),
 

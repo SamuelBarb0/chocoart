@@ -75,6 +75,7 @@ class SettingResource extends Resource
                     ->columns(2),
 
                 Forms\Components\Section::make('Valor')
+                    ->description('⚠️ Las imágenes/videos se gestionan SOLO desde: /admin/settings-upload (fuera de Filament)')
                     ->schema([
                         Forms\Components\Textarea::make('description')
                             ->label('Descripción')
@@ -96,27 +97,10 @@ class SettingResource extends Resource
                             ->visible(fn ($get) => $get('type') === 'textarea')
                             ->columnSpanFull(),
 
-                        Forms\Components\Placeholder::make('upload_link')
-                            ->label('Subir Imagen o Video')
-                            ->content(function ($record) {
-                                $url = route('settings.upload.index');
-                                return new \Illuminate\Support\HtmlString(
-                                    '<div class="space-y-3">' .
-                                    '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">' .
-                                    '📤 Abrir página de subida de archivos' .
-                                    '</a>' .
-                                    '<p class="text-sm text-gray-600">Los archivos se suben en una página separada para evitar problemas de servidor.</p>' .
-                                    ($record && $record->value ? '<p class="text-sm text-green-600">✓ Archivo actual: ' . basename($record->value) . '</p>' : '') .
-                                    '</div>'
-                                );
-                            })
-                            ->visible(fn ($get) => $get('type') === 'image')
-                            ->columnSpanFull(),
-
                         Forms\Components\TextInput::make('value')
-                            ->label('Ruta del archivo')
+                            ->label('Ruta del archivo (solo lectura)')
                             ->placeholder('settings/nombre-archivo.jpg')
-                            ->helperText('Ruta del archivo en storage/app/public/')
+                            ->helperText('Los archivos se suben desde /admin/settings-upload')
                             ->disabled()
                             ->dehydrated(true)
                             ->visible(fn ($get) => $get('type') === 'image')
