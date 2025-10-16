@@ -38,6 +38,9 @@ class AdminUploadController extends Controller
      */
     public function uploadMain(Request $request)
     {
+    ini_set('upload_tmp_dir', '/home/yjopjnuw/tmp/php-uploads');
+    ini_set('sys_temp_dir', '/home/yjopjnuw/tmp/php-uploads');
+
         \Log::info('=== INICIO uploadMain ===');
         \Log::info('Request data:', $request->all());
         \Log::info('$_FILES:', $_FILES);
