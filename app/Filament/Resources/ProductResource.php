@@ -138,6 +138,34 @@ class ProductResource extends Resource
                             ->helperText('Aparece en la sección de productos destacados'),
                     ])->columns(2),
 
+                Forms\Components\Section::make('WhatsApp')
+                    ->schema([
+                        Forms\Components\Toggle::make('whatsapp_enabled')
+                            ->label('Botón WhatsApp Habilitado')
+                            ->default(true)
+                            ->inline(false)
+                            ->helperText('Mostrar botón "Pedir" en el producto')
+                            ->live(),
+                        Forms\Components\Textarea::make('whatsapp_message')
+                            ->label('Mensaje WhatsApp')
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->placeholder('Hola! Me interesa el producto: {nombre}')
+                            ->helperText('Mensaje personalizado que se enviará. Deja vacío para usar el predeterminado.')
+                            ->columnSpanFull()
+                            ->visible(fn (Forms\Get $get) => $get('whatsapp_enabled')),
+                        Forms\Components\TimePicker::make('available_from')
+                            ->label('Disponible desde')
+                            ->seconds(false)
+                            ->helperText('Hora de inicio para pedidos (formato 24h). Deja vacío para 24/7')
+                            ->visible(fn (Forms\Get $get) => $get('whatsapp_enabled')),
+                        Forms\Components\TimePicker::make('available_to')
+                            ->label('Disponible hasta')
+                            ->seconds(false)
+                            ->helperText('Hora de fin para pedidos (formato 24h). Deja vacío para 24/7')
+                            ->visible(fn (Forms\Get $get) => $get('whatsapp_enabled')),
+                    ])->columns(2)->collapsed(),
+
                 Forms\Components\Section::make('SEO')
                     ->schema([
                         Forms\Components\TextInput::make('meta_title')
