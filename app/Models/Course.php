@@ -17,6 +17,7 @@ class Course extends Model
         'description',
         'content',
         'level',
+        'category_id',
         'price',
         'duration_hours',
         'icon',
@@ -190,5 +191,13 @@ class Course extends Model
             'Todos los niveles' => 'from-[#c6d379] to-[#e28dc4]', // Verde a rosa
             default => 'from-[#81cacf] to-[#c6d379]',        // Default
         };
+    }
+
+    /**
+     * Relación con Category
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

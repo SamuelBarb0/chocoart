@@ -25,12 +25,15 @@ class SettingResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Información General')
+                    ->description(fn ($record) => $record !== null ? '⚠️ Esta sección está bloqueada durante la edición. Solo se puede modificar el valor.' : null)
                     ->schema([
                         Forms\Components\TextInput::make('label')
                             ->label('Etiqueta')
                             ->required()
                             ->maxLength(255)
-                            ->helperText('Nombre visible de esta configuración'),
+                            ->helperText('Nombre visible de esta configuración')
+                            ->disabled(fn ($record) => $record !== null)
+                            ->dehydrated(fn ($record) => $record === null),
 
                         Forms\Components\TextInput::make('key')
                             ->label('Clave')
@@ -38,7 +41,8 @@ class SettingResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
                             ->helperText('Identificador único (no modificar si ya existe)')
-                            ->disabled(fn ($record) => $record !== null),
+                            ->disabled(fn ($record) => $record !== null)
+                            ->dehydrated(fn ($record) => $record === null),
 
                         Forms\Components\Select::make('group')
                             ->label('Grupo')
@@ -50,7 +54,9 @@ class SettingResource extends Resource
                                 'footer'  => 'Footer',
                                 'general' => 'General',
                             ])
-                            ->default('general'),
+                            ->default('general')
+                            ->disabled(fn ($record) => $record !== null)
+                            ->dehydrated(fn ($record) => $record === null),
 
                         Forms\Components\Select::make('type')
                             ->label('Tipo')
@@ -64,18 +70,22 @@ class SettingResource extends Resource
                                 'image'    => 'Imagen',
                             ])
                             ->default('text')
-                            ->reactive(),
+                            ->reactive()
+                            ->disabled(fn ($record) => $record !== null)
+                            ->dehydrated(fn ($record) => $record === null),
 
                         Forms\Components\TextInput::make('order')
                             ->label('Orden')
                             ->numeric()
                             ->default(0)
-                            ->helperText('Orden de aparición en listados'),
+                            ->helperText('Orden de aparición en listados')
+                            ->disabled(fn ($record) => $record !== null)
+                            ->dehydrated(fn ($record) => $record === null),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->collapsed(fn ($record) => $record !== null),
 
                 Forms\Components\Section::make('Valor')
-                    ->description('⚠️ Las imágenes/videos se gestionan SOLO desde: /admin/settings-upload (fuera de Filament)')
                     ->schema([
                         Forms\Components\Textarea::make('description')
                             ->label('Descripción')
@@ -97,12 +107,13 @@ class SettingResource extends Resource
                             ->visible(fn ($get) => $get('type') === 'textarea')
                             ->columnSpanFull(),
 
-                        Forms\Components\TextInput::make('value')
-                            ->label('Ruta del archivo (solo lectura)')
-                            ->placeholder('settings/nombre-archivo.jpg')
-                            ->helperText('Los archivos se suben desde /admin/settings-upload')
-                            ->disabled()
-                            ->dehydrated(true)
+                        Forms\Components\FileUpload::make('value')
+                            ->label('Archivo (Imagen o Video)')
+                            ->directory('settings')
+                            ->disk('public')
+                            ->acceptedFileTypes(['image/*', 'video/*'])
+                            ->maxSize(51200)
+                            ->helperText('Sube una imagen o video (máx. 50MB). El tipo "Imagen" acepta ambos formatos.')
                             ->visible(fn ($get) => $get('type') === 'image')
                             ->columnSpanFull(),
                     ]),
@@ -211,8 +222,12 @@ class SettingResource extends Resource
     {
         return [
             'index'  => Pages\ListSettings::route('/'),
-            'create' => Pages\CreateSetting::route('/create'),
             'edit'   => Pages\EditSetting::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

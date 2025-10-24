@@ -13,7 +13,7 @@ class Post extends Model
     protected $fillable = [
         'title',
         'slug',
-        'category',
+        'category_id',
         'excerpt',
         'content',
         'icon',
@@ -66,5 +66,13 @@ class Post extends Model
                 $post->meta_description = $post->excerpt;
             }
         });
+    }
+
+    /**
+     * Relación con Category
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

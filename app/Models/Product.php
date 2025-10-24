@@ -11,7 +11,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name','slug','description','price','category',
+        'name','slug','description','price','category_id',
         'icon','gradient','image','images',
         'featured','published','order',
         'meta_title','meta_description','meta_keywords',
@@ -85,5 +85,11 @@ class Product extends Model
     {
         $arr = is_array($this->images) ? $this->images : [];
         return array_map(fn($p) => \Storage::disk('public')->url($p), $arr);
+    }
+
+    /** ----- Relación con Category ----- */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

@@ -41,9 +41,22 @@ class GalleryImageResource extends Resource
                             ->label('Descripción')
                             ->rows(3)
                             ->columnSpanFull(),
-                        Forms\Components\TextInput::make('category')
+                        Forms\Components\Select::make('category_id')
                             ->label('Categoría')
-                            ->helperText('Ej: Productos, Cursos, Eventos, etc.'),
+                            ->relationship('category', 'name', fn($query) => $query->where('type', 'gallery')->where('active', true)->orderBy('order'))
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nombre')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\Hidden::make('type')
+                                    ->default('gallery'),
+                                Forms\Components\Hidden::make('active')
+                                    ->default(true),
+                            ])
+                            ->helperText('Categoría de la imagen. Puedes crear una nueva si no existe.'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Imagen')
@@ -104,9 +117,10 @@ class GalleryImageResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(40),
-                Tables\Columns\TextColumn::make('category')
+                Tables\Columns\TextColumn::make('category.name')
                     ->label('Categoría')
                     ->badge()
+                    ->default('-')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('featured')

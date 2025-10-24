@@ -38,6 +38,22 @@ class CourseResource extends Resource
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->helperText('Se genera automáticamente'),
+                        Forms\Components\Select::make('category_id')
+                            ->label('Categoría')
+                            ->relationship('category', 'name', fn($query) => $query->where('type', 'course')->where('active', true)->orderBy('order'))
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nombre')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\Hidden::make('type')
+                                    ->default('course'),
+                                Forms\Components\Hidden::make('active')
+                                    ->default(true),
+                            ])
+                            ->helperText('Categoría del curso. Puedes crear una nueva si no existe.'),
                         Forms\Components\Select::make('level')
                             ->label('Nivel')
                             ->required()
@@ -178,6 +194,13 @@ class CourseResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(40),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Categoría')
+                    ->badge()
+                    ->default('-')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('level')
                     ->label('Nivel')
                     ->badge()
@@ -210,6 +233,11 @@ class CourseResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Categoría')
+                    ->relationship('category', 'name', fn($query) => $query->where('type', 'course')->where('active', true))
+                    ->searchable()
+                    ->preload(),
                 Tables\Filters\SelectFilter::make('level')
                     ->label('Nivel')
                     ->options([

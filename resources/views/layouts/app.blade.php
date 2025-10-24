@@ -256,8 +256,9 @@
       </div>
 
       <div class="container-choco pt-20">
-        <div class="grid gap-10 lg:grid-cols-4 py-12">
-          <div class="col-span-1">
+        <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 py-12">
+          <!-- Columna 1: Logo y Redes Sociales -->
+          <div>
             @php
               $footerLogo = \App\Models\Setting::get('footer_logo', 'images/PRINCIPAL.png');
               $logoPath = str_starts_with($footerLogo, 'settings/') ? asset('storage/' . $footerLogo) : asset($footerLogo);
@@ -266,51 +267,69 @@
             <p class="text-[#5f3917] font-['Dancing_Script'] text-xl mb-4">{{ \App\Models\Setting::get('footer_about', 'Arte dulce con amor') }}</p>
             <div class="flex items-center gap-3">
               @if(\App\Models\Setting::get('social_facebook'))
-              <a href="{{ \App\Models\Setting::get('social_facebook') }}" aria-label="Facebook" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#e28dc4] hover:bg-[#e28dc4] hover:text-white transition-all duración-300" target="_blank" rel="noopener">
+              <a href="{{ \App\Models\Setting::get('social_facebook') }}" aria-label="Facebook" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#e28dc4] hover:bg-[#e28dc4] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
               </a>
               @endif
               @if(\App\Models\Setting::get('social_instagram'))
-              <a href="{{ \App\Models\Setting::get('social_instagram') }}" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#81cacf] hover:bg-[#81cacf] hover:text-white transition-all duración-300" target="_blank" rel="noopener">
+              <a href="{{ \App\Models\Setting::get('social_instagram') }}" aria-label="Instagram" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#81cacf] hover:bg-[#81cacf] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
               </a>
               @endif
               @if(\App\Models\Setting::get('contact_whatsapp'))
-              <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '573001234567') }}" aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#c6d379] hover:bg-[#c6d379] hover:text-white transition-all duración-300" target="_blank" rel="noopener">
+              <a href="https://wa.me/{{ \App\Models\Setting::get('contact_whatsapp', '573001234567') }}" aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center text-[#c6d379] hover:bg-[#c6d379] hover:text-white transition-all duration-300" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
               </a>
               @endif
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-8 lg:col-span-3">
-            <div>
-              <h4 class="text-[#5f3917] font-bold mb-4 text-lg">Productos</h4>
-              <ul class="space-y-3 text-gray-600">
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🧁</span> Cupcakes</a></li>
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🎂</span> Pasteles</a></li>
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🍪</span> Macarons</a></li>
-                <li><a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}"><span class="text-sm">🍰</span> Postres</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 class="text-[#5f3917] font-bold mb-4 text-lg">Academia</h4>
-              <ul class="space-y-3 text-gray-600">
-                <li><a class="hover:text-[#81cacf] transition-colors" href="{{ route('cursos') }}">Curso Básico</a></li>
-                <li><a class="hover:text-[#81cacf] transition-colors" href="{{ route('cursos') }}">Curso Avanzado</a></li>
-                <li><a class="hover:text-[#81cacf] transition-colors" href="{{ route('cursos') }}">Masterclass</a></li>
-                <li><a class="hover:text-[#81cacf] transition-colors" href="{{ route('cursos') }}">Corporativo</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 class="text-[#5f3917] font-bold mb-4 text-lg">Información</h4>
-              <ul class="space-y-3 text-gray-600">
-                <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('home') }}">Sobre Nosotros</a></li>
-                <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('galeria') }}">Galería</a></li>
-                <li><a class="hover:text-[#c6d379] transition-colors" href="#">FAQ</a></li>
-                <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('contacto') }}">Contacto</a></li>
-              </ul>
-            </div>
+          <!-- Columna 2: Productos -->
+          <div>
+            <h4 class="text-[#5f3917] font-bold mb-4 text-lg">Productos</h4>
+            <ul class="space-y-3 text-gray-600">
+              @if(isset($footerProducts) && $footerProducts->count() > 0)
+                @foreach($footerProducts as $product)
+                  <li>
+                    <a class="hover:text-[#e28dc4] transition-colors inline-flex items-center gap-2" href="{{ route('productos') }}">
+                      @if($product->icon)
+                        <span class="text-sm">{{ $product->icon }}</span>
+                      @endif
+                      {{ $product->name }}
+                    </a>
+                  </li>
+                @endforeach
+              @else
+                <li><a class="hover:text-[#e28dc4] transition-colors" href="{{ route('productos') }}">Ver todos</a></li>
+              @endif
+            </ul>
+          </div>
+
+          <!-- Columna 3: Academia -->
+          <div>
+            <h4 class="text-[#5f3917] font-bold mb-4 text-lg">Academia</h4>
+            <ul class="space-y-3 text-gray-600">
+              @if(isset($footerCourses) && $footerCourses->count() > 0)
+                @foreach($footerCourses as $course)
+                  <li><a class="hover:text-[#81cacf] transition-colors" href="{{ route('cursos') }}">{{ $course->title }}</a></li>
+                @endforeach
+              @else
+                <li><a class="hover:text-[#81cacf] transition-colors" href="{{ route('cursos') }}">Ver todos</a></li>
+              @endif
+            </ul>
+          </div>
+
+          <!-- Columna 4: Información -->
+          <div>
+            <h4 class="text-[#5f3917] font-bold mb-4 text-lg">Información</h4>
+            <ul class="space-y-3 text-gray-600">
+              <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('home') }}">Inicio</a></li>
+              <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('productos') }}">Productos</a></li>
+              <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('cursos') }}">Cursos</a></li>
+              <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('galeria') }}">Galería</a></li>
+              <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('blog') }}">Blog</a></li>
+              <li><a class="hover:text-[#c6d379] transition-colors" href="{{ route('contacto') }}">Contacto</a></li>
+            </ul>
           </div>
         </div>
 

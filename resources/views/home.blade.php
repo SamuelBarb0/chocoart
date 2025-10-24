@@ -346,11 +346,11 @@
   use App\Models\GalleryImage;
 
   // 1) Toma destacados primero, luego completa hasta 4 con el resto según 'order'
-  $destacadas = GalleryImage::featured()->ordered()->take(4)->get();
+  $destacadas = GalleryImage::with('category')->featured()->ordered()->take(4)->get();
   $faltan = 4 - $destacadas->count();
 
   $otras = $faltan > 0
-      ? GalleryImage::whereNotIn('id', $destacadas->pluck('id'))
+      ? GalleryImage::with('category')->whereNotIn('id', $destacadas->pluck('id'))
           ->ordered()
           ->take($faltan)
           ->get()
@@ -373,13 +373,17 @@
     @if($preview->count())
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto mb-12">
         @foreach($preview as $item)
+          @php
+            $categoryRelation = $item->relationLoaded('category') ? $item->getRelation('category') : null;
+            $categoryName = $categoryRelation ? $categoryRelation->name : (is_string($item->category) ? $item->category : '');
+          @endphp
           <a href="{{ route('galeria') }}"
              class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 cursor-pointer block"
-             aria-label="{{ $item->title ?? $item->category ?? 'Imagen de la galería' }}">
+             aria-label="{{ $item->title ?? $categoryName ?? 'Imagen de la galería' }}">
 
             @if($item->image_url)
               {{-- Si hay imagen, mostrarla sin gradiente encima --}}
-              <img src="{{ $item->image_url }}" alt="{{ $item->title ?? $item->category ?? 'Imagen de galería' }}"
+              <img src="{{ $item->image_url }}" alt="{{ $item->title ?? $categoryName ?? 'Imagen de galería' }}"
                    class="absolute inset-0 w-full h-full object-cover" loading="lazy">
             @else
               {{-- Si NO hay imagen, mostrar el gradiente --}}
@@ -390,10 +394,10 @@
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
               <div class="text-center px-4">
                 <h4 class="text-white text-lg font-semibold">
-                  {{ $item->title ?: ($item->category ?: 'Ver más') }}
+                  {{ $item->title ?: ($categoryName ?: 'Ver más') }}
                 </h4>
-                @if($item->category)
-                  <p class="text-white/80 text-sm mt-1">{{ $item->category }}</p>
+                @if($categoryName)
+                  <p class="text-white/80 text-sm mt-1">{{ $categoryName }}</p>
                 @endif
               </div>
             </div>

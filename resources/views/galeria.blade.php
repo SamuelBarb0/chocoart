@@ -122,7 +122,12 @@
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center p-4">
             <div class="text-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <h4 class="text-lg md:text-xl font-semibold mb-1">{{ $img->title }}</h4>
-              @if($img->category)
+              @php
+                $categoryRelation = $img->relationLoaded('category') ? $img->getRelation('category') : null;
+              @endphp
+              @if($categoryRelation)
+                <p class="text-xs uppercase tracking-wide opacity-80">{{ $categoryRelation->name }}</p>
+              @elseif(is_string($img->category) && $img->category)
                 <p class="text-xs uppercase tracking-wide opacity-80">{{ $img->category }}</p>
               @endif
             </div>

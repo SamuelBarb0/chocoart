@@ -45,17 +45,22 @@ class PostResource extends Resource
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->helperText('Se genera automáticamente desde el título'),
-                        Forms\Components\Select::make('category')
+                        Forms\Components\Select::make('category_id')
                             ->label('Categoría')
-                            ->required()
-                            ->options([
-                                'Técnicas' => 'Técnicas',
-                                'Recetas' => 'Recetas',
-                                'Negocio' => 'Negocio',
-                                'Historia' => 'Historia',
-                                'Decoración' => 'Decoración',
+                            ->relationship('category', 'name', fn($query) => $query->where('type', 'post')->where('active', true)->orderBy('order'))
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nombre')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\Hidden::make('type')
+                                    ->default('post'),
+                                Forms\Components\Hidden::make('active')
+                                    ->default(true),
                             ])
-                            ->searchable(),
+                            ->helperText('Categoría del post. Puedes crear una nueva si no existe.'),
                         Forms\Components\Textarea::make('excerpt')
                             ->label('Extracto')
                             ->required()
@@ -163,9 +168,10 @@ class PostResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-                Tables\Columns\TextColumn::make('category')
+                Tables\Columns\TextColumn::make('category.name')
                     ->label('Categoría')
                     ->badge()
+                    ->default('-')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('published')
@@ -195,15 +201,11 @@ class PostResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
+                Tables\Filters\SelectFilter::make('category_id')
                     ->label('Categoría')
-                    ->options([
-                        'Técnicas' => 'Técnicas',
-                        'Recetas' => 'Recetas',
-                        'Negocio' => 'Negocio',
-                        'Historia' => 'Historia',
-                        'Decoración' => 'Decoración',
-                    ]),
+                    ->relationship('category', 'name', fn($query) => $query->where('type', 'post')->where('active', true))
+                    ->searchable()
+                    ->preload(),
                 Tables\Filters\TernaryFilter::make('published')
                     ->label('Publicado')
                     ->placeholder('Todos')

@@ -12,7 +12,7 @@ class GalleryImage extends Model
     protected $table = 'gallery_images';
 
     protected $fillable = [
-        'title','description','image','category',
+        'title','description','image','category_id',
         'gradient','featured','order',
     ];
 
@@ -39,6 +39,10 @@ class GalleryImage extends Model
 
     public function getCategorySlugAttribute(): string
     {
+        $categoryRelation = $this->relationLoaded('category') ? $this->getRelation('category') : null;
+        if ($categoryRelation) {
+            return $categoryRelation->slug;
+        }
         return str($this->category ?? 'otros')->lower()->slug('-');
     }
 
@@ -60,4 +64,10 @@ class GalleryImage extends Model
     /** Scopes */
     public function scopeFeatured($q){ return $q->where('featured', true); }
     public function scopeOrdered($q){ return $q->orderBy('order')->orderBy('id'); }
+
+    /** Relación con Category */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

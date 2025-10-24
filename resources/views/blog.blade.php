@@ -54,9 +54,18 @@
           <div class="absolute inset-0 flex items-center justify-center text-7xl">
             {{ $post->icon }}
           </div>
+          @php
+            $categoryRelation = $post->relationLoaded('category') ? $post->getRelation('category') : null;
+          @endphp
+          @if($categoryRelation)
+          <div class="absolute top-4 right-4 bg-[#5f3917] text-white px-3 py-1 rounded-full text-xs font-semibold">
+            {{ $categoryRelation->name }}
+          </div>
+          @elseif(is_string($post->category) && $post->category)
           <div class="absolute top-4 right-4 bg-[#5f3917] text-white px-3 py-1 rounded-full text-xs font-semibold">
             {{ $post->category }}
           </div>
+          @endif
         </div>
         <div class="p-6">
           <div class="text-sm text-gray-500 mb-2">

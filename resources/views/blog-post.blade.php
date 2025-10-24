@@ -17,11 +17,22 @@
       </a>
 
       <!-- Category Badge -->
+      @php
+        $categoryRelation = $post->relationLoaded('category') ? $post->getRelation('category') : null;
+      @endphp
+      @if($categoryRelation)
+      <div class="mb-4">
+        <span class="inline-block bg-[#e28dc4] text-white px-4 py-2 rounded-full text-sm font-semibold">
+          {{ $categoryRelation->name }}
+        </span>
+      </div>
+      @elseif(is_string($post->category) && $post->category)
       <div class="mb-4">
         <span class="inline-block bg-[#e28dc4] text-white px-4 py-2 rounded-full text-sm font-semibold">
           {{ $post->category }}
         </span>
       </div>
+      @endif
 
       <!-- Title -->
       <h1 class="font-['Dancing_Script'] text-4xl md:text-5xl lg:text-6xl text-white mb-4 leading-tight">

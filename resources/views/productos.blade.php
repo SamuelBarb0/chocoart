@@ -161,7 +161,16 @@
 
         <div class="text-center">
           <h3 class="text-2xl font-semibold text-[var(--choco)] mb-2">{{ $producto->name }}</h3>
+          @php
+            $categoryRelation = $producto->relationLoaded('category') ? $producto->getRelation('category') : null;
+          @endphp
+          @if($categoryRelation)
+          <p class="text-gray-500 text-sm mb-1">{{ $categoryRelation->name }}</p>
+          @elseif(is_string($producto->category) && $producto->category)
           <p class="text-gray-500 text-sm mb-1">{{ $producto->category }}</p>
+          @else
+          <p class="text-gray-400 text-sm mb-1">&nbsp;</p>
+          @endif
           @if($producto->price)
           <p class="text-[var(--rosa)] font-bold text-lg mb-3">
             ${{ number_format($producto->price, 0, ',', '.') }}
@@ -174,7 +183,7 @@
             type="button"
             class="open-modal btn-choco focus-ring inline-block px-6 py-2 rounded-full font-semibold transition"
             data-title="{{ $producto->name }}"
-            data-subtitle="{{ $producto->category }}"
+            data-subtitle="{{ $categoryRelation ? $categoryRelation->name : ($producto->category ?? '') }}"
             data-desc="{{ strip_tags($producto->description) }}"
             data-bullets='[]'
             data-notes=""

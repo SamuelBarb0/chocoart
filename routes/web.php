@@ -12,37 +12,39 @@ use App\Http\Controllers\SeoUploadController;
 
 // Home page
 Route::get('/', function () {
-    $productos = Product::where('published', true)->orderBy('order')->get();
+    $productos = Product::with('category')->where('published', true)->orderBy('order')->get();
     return view('home', compact('productos'));
 })->name('home');
 
 // Productos
 Route::get('/productos', function () {
-    $productos = Product::where('published', true)->orderBy('order')->get();
+    $productos = Product::with('category')->where('published', true)->orderBy('order')->get();
     return view('productos', compact('productos'));
 })->name('productos');
 
 // Cursos
 Route::get('/cursos', function () {
-    $cursos = Course::where('published', true)->orderBy('order')->get();
+    $cursos = Course::with('category')->where('published', true)->orderBy('order')->get();
     return view('cursos', compact('cursos'));
 })->name('cursos');
 
 // Galería
 Route::get('/galeria', function () {
-    $images = GalleryImage::query()
+    $images = GalleryImage::with('category')
         ->orderByDesc('featured')
         ->orderBy('order')
         ->orderBy('id')
         ->get();
 
-    $categories = $images->pluck('category')
-        ->filter()
-        ->unique()
-        ->values()
-        ->map(fn ($c) => [
-            'label' => $c,
-            'slug'  => Str::of($c)->lower()->slug('-'),
+    // Obtener solo categorías que tienen imágenes asignadas
+    $categories = \App\Models\Category::where('type', 'gallery')
+        ->where('active', true)
+        ->whereHas('galleryImages') // Solo categorías con imágenes
+        ->orderBy('order')
+        ->get()
+        ->map(fn ($cat) => [
+            'label' => $cat->name,
+            'slug'  => $cat->slug,
         ]);
 
     return view('galeria', compact('images', 'categories'));
@@ -50,25 +52,27 @@ Route::get('/galeria', function () {
 
 // Blog
 Route::get('/blog', function () {
-    $posts = Post::where('published', true)->orderBy('published_at', 'desc')->get();
+    $posts = Post::with('category')->where('published', true)->orderBy('published_at', 'desc')->get();
     return view('blog', compact('posts'));
 })->name('blog');
 
 // Blog Post Individual
 Route::get('/blog/{slug}', function ($slug) {
-    $post = Post::where('slug', $slug)->where('published', true)->firstOrFail();
+    $post = Post::with('category')->where('slug', $slug)->where('published', true)->firstOrFail();
 
     // Obtener posts relacionados (misma categoría o los más recientes)
-    $relatedPosts = Post::where('published', true)
+    $relatedPosts = Post::with('category')
+        ->where('published', true)
         ->where('id', '!=', $post->id)
-        ->where('category', $post->category)
+        ->where('category_id', $post->category_id)
         ->orderBy('published_at', 'desc')
         ->take(3)
         ->get();
 
     // Si no hay suficientes de la misma categoría, llenar con otros posts recientes
     if ($relatedPosts->count() < 3) {
-        $additionalPosts = Post::where('published', true)
+        $additionalPosts = Post::with('category')
+            ->where('published', true)
             ->where('id', '!=', $post->id)
             ->whereNotIn('id', $relatedPosts->pluck('id'))
             ->orderBy('published_at', 'desc')
