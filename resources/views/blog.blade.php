@@ -103,32 +103,6 @@
   </div>
 </section>
 
-<!-- Newsletter Section -->
-<section class="py-20 bg-gradient-to-br from-pink-50 via-blue-50 to-lime-50">
-  <div class="container-choco">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="font-['Dancing_Script'] text-4xl md:text-5xl text-[#5f3917] mb-4">
-        Suscríbete al Newsletter
-      </h2>
-      <p class="text-gray-600 mb-8 text-lg">
-        Recibe consejos, recetas exclusivas y novedades directamente en tu correo
-      </p>
-      <form class="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
-        <input
-          type="email"
-          placeholder="Tu correo electrónico"
-          class="flex-1 px-6 py-4 rounded-full border-2 border-[#81cacf] focus:outline-none focus:border-[#e28dc4] transition-colors"
-        >
-        <button
-          type="submit"
-          class="px-8 py-4 bg-[#5f3917] text-white rounded-full font-semibold hover:bg-[#e28dc4] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-        >
-          Suscribirme
-        </button>
-      </form>
-    </div>
-  </div>
-</section>
 
 @endsection
 
