@@ -64,7 +64,7 @@ return [
     */
 
     'temporary_file_upload' => [
-        'disk' => 'public',    // Use public disk for file uploads
+        'disk' => 'local',    // Use public disk for file uploads
         'rules' => ['required', 'file', 'max:51200'], // 50MB max (same as Filament resources)
         'directory' => 'livewire-tmp',   // Temporary upload directory
         'middleware' => null,  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
